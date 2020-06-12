@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -53,6 +54,9 @@ namespace SharesiesToSharesight.SharesiesClient
             var result = await httpClient.PostAsync("identity/login", content);
             if (result.IsSuccessStatusCode)
             {
+                var user = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(
+                    await result.Content.ReadAsStringAsync())["user"].ToString();
+                userId = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(user)["id"].ToString();
                 _logger.LogInformation("Connected to sharesies!");
                 foreach (var cookie in result.Headers.First(s => s.Key.Equals("Set-Cookie", StringComparison.CurrentCultureIgnoreCase)).Value)
                 {
