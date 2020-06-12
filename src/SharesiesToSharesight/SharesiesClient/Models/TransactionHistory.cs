@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace SharesiesToSharesight.SharesiesClient
+namespace SharesiesToSharesight.SharesiesClient.Models
 {
     public class TransactionHistory
     {

@@ -5,8 +5,8 @@ namespace SharesiesToSharesight.SharesightClient
 {
     public class SharesightClient : ISharesightClient
     {
-        private IHttpClientFactory _clientFactory;
-        private ILogger<SharesightClient> _logger;
+        private readonly IHttpClientFactory _clientFactory;
+        private readonly ILogger<SharesightClient> _logger;
 
         public SharesightClient(IHttpClientFactory clientFactory, ILogger<SharesightClient> logger)
         {

@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace SharesiesToSharesight.SharesiesClient
+namespace SharesiesToSharesight.SharesiesClient.Models
 {
     public class Transaction
     {
@@ -18,7 +18,7 @@ namespace SharesiesToSharesight.SharesiesClient
         public object CsnTransferOrder { get; set; }
 
         [JsonPropertyName("currency")]
-        public Currency Currency { get; set; }
+        public string Currency { get; set; }
 
         [JsonPropertyName("description")]
         public string Description { get; set; }
