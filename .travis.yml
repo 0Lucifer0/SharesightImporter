@@ -1,0 +1,27 @@
+language: csharp
+mono: none
+dist: xenial
+os: linux
+addons:
+  snaps:
+    - name: dotnet-sdk
+      confinement: classic
+      channel: 3.1/stable
+install:
+  - 'export PATH="$PATH:/home/travis/.dotnet/tools"'
+  - 'export PATH="$PATH:$HOME/.local/bin"'
+  - pip install --user awscli
+  - sudo snap alias dotnet-sdk.dotnet dotnet
+  - dotnet --version
+env:
+  global:
+    - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+    - DOTNET_CLI_TELEMETRY_OPTOUT=1
+jobs:
+  include:
+    - stage: test_unit_testing
+      name: Run tests on SharesiesToSharesight
+      script:
+        - dotnet restore
+        - dotnet build
+        - dotnet test test/SharesiesToSharesight.Tests -v m
