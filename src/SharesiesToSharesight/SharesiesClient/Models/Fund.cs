@@ -21,7 +21,7 @@ namespace SharesiesToSharesight.SharesiesClient.Models
         public string[] Categories { get; set; } = null!;
 
         [JsonPropertyName("code")]
-        public string Code { get; set; }
+        public string Code { get; set; } = null!;
 
         [JsonPropertyName("comparison_prices")]
         public ComparisonPrices ComparisonPrices { get; set; } = null!;
