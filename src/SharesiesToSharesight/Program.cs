@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 using SharesiesToSharesight.SharesiesClient;
 using SharesiesToSharesight.SharesightClient;
 
@@ -21,7 +22,12 @@ namespace SharesiesToSharesight
             var configuration = new Configuration.Configuration();
             new ConfigurationBuilder().AddYamlFile("config.yml").Build().Bind(configuration);
             Validator.ValidateObject(configuration, new ValidationContext(configuration), true);
-            Log.Logger = new LoggerConfiguration().Enrich.FromLogContext().WriteTo.Console(outputTemplate: "{Level:u4} {Timestamp:HH:mm:ss} -- {Message:lj}{NewLine}{Exception}").CreateLogger();
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console(outputTemplate: "{Level:u4} {Timestamp:HH:mm:ss} -- {Message:lj}{NewLine}{Exception}")
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .CreateLogger();
             return Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(
                     loggingBuilder =>

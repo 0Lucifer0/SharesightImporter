@@ -8,9 +8,9 @@ namespace SharesiesToSharesight.SharesiesClient.Models
         public bool HasMore { get; set; }
 
         [JsonPropertyName("transactions")]
-        public Transaction[] Transactions { get; set; }
+        public Transaction[] Transactions { get; set; } = null!;
 
         [JsonPropertyName("type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = null!;
     }
 }

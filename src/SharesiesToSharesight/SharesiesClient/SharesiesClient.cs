@@ -21,7 +21,7 @@ namespace SharesiesToSharesight.SharesiesClient
         private readonly Uri _uri = new Uri("https://app.sharesies.nz/api/");
         private CookieContainer _cookies = new CookieContainer();
         private readonly Configuration.Configuration _configuration;
-        private string? userId = null;
+        private string? _userId = null;
         public SharesiesClient(IHttpClientFactory clientFactory, ILogger<SharesiesClient> logger, Configuration.Configuration configuration)
         {
             _clientFactory = clientFactory;
@@ -33,7 +33,7 @@ namespace SharesiesToSharesight.SharesiesClient
         {
             if (_cookies.Count > 0 && !_cookies.GetCookies(_uri).ToList().Any(s => s.Expired))
             {
-                _logger.LogInformation("Using sharesies cached session");
+                _logger.LogTrace("Using sharesies cached session");
                 return;
             }
             _cookies = new CookieContainer();
@@ -56,7 +56,7 @@ namespace SharesiesToSharesight.SharesiesClient
             {
                 var user = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(
                     await result.Content.ReadAsStringAsync())["user"].ToString();
-                userId = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(user)["id"].ToString();
+                _userId = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(user)["id"].ToString();
                 _logger.LogInformation("Connected to sharesies!");
                 foreach (var cookie in result.Headers.First(s => s.Key.Equals("Set-Cookie", StringComparison.CurrentCultureIgnoreCase)).Value)
                 {
@@ -79,7 +79,7 @@ namespace SharesiesToSharesight.SharesiesClient
             httpClient.DefaultRequestHeaders.Add("Cookie", _cookies.GetCookieHeader(_uri));
             var content = new Dictionary<string, string>
             {
-                {"acting_as_id", userId!},
+                {"acting_as_id", _userId!},
                 {"limit", "50"}
             };
             if (beforeId != null)
@@ -98,6 +98,24 @@ namespace SharesiesToSharesight.SharesiesClient
                 return JsonSerializer.Deserialize<TransactionHistory>(resultJson, options);
             }
             _logger.LogError("Retrieving transactions from sharesies failed", result.ReasonPhrase);
+            throw new ArgumentException();
+        }
+
+        public async Task<Dictionary<Guid, string>> GetSymbolsAsync()
+        {
+            var httpClient = _clientFactory.CreateClient();
+            httpClient.BaseAddress = _uri;
+            var result = await httpClient.GetAsync("fund/list");
+            if (result.IsSuccessStatusCode)
+            {
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                var resultJson = await result.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<FundList>(resultJson, options).Funds.ToDictionary(s => s.Id, s => s.Code);
+            }
+            _logger.LogError("Retrieving funds from sharesies failed", result.ReasonPhrase);
             throw new ArgumentException();
         }
     }

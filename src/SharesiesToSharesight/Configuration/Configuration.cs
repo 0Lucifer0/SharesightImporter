@@ -2,9 +2,9 @@
 {
     public class Configuration
     {
-        public SharesiesClientConfiguration SharesiesClient { get; set; }
+        public SharesiesClientConfiguration SharesiesClient { get; set; } = null!;
 
-        public SharesightClientConfiguration SharesightClient { get; set; }
+        public SharesightClientConfiguration SharesightClient { get; set; } = null!;
 
     }
 }

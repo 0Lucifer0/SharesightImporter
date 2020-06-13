@@ -2,3 +2,6 @@
   Email: ''
   Password: ''
 SharesightClient:
+  CliendId: ''
+  ClientSecret: ''
+  PortfolioId: ''
