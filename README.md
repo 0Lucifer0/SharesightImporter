@@ -22,6 +22,7 @@ Ensure you have dotnet core 3.1 installed: https://dotnet.microsoft.com/download
 ## Can I run it as a background task ? ##
 Yes you can! 
 > scripts/setup-service.cmd
+
 (this has to be ran as Administrator)
 It will automatically setup this tool as a windows service. 
 The Service will then automatically sync payments every one hour.
