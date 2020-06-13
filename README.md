@@ -1,12 +1,16 @@
 # Sharesies To Sharesight #
 [![Travis build status](https://travis-ci.org/0Lucifer0/SharesiesToSharesight.svg?branch=master)](https://travis-ci.org/0Lucifer0/SharesiesToSharesight)
 
-## Referal Links ##
-If you are interested in investing from New Zealand here some referal links:
-- Sharesies : https://sharesies.nz/r/X99G4R ($5.00)
-- Sharesight : https://portfolio.sharesight.com/refer/CEM81 (10% of annual billing)
-- Hatch : https://app.hatchinvest.nz/ (no referal system sorry however it has Sharesight integration!)
-- Stake : https://hellostake.com/referral-program?referrer=erwanj724 (Gopro, Dropbox or Nike free stock! Sharesight can parse the email as a portfolio email)
+## Referral Links ##
+If you are interested in investing from New Zealand here some referral links:
+- <a href="https://sharesies.nz/r/X99G4R"/><img src="https://static1.squarespace.com/static/58bc788c59cc68b9696b9ee0/t/5bfe00514ae23736655bacca/1591327857356/" height="45"/></a>
+The referral link offers you $5.00
+- <a href="https://portfolio.sharesight.com/refer/CEM81"/><img src="https://www.sharesight.com/img/logos/logo-11a4fd04.svg" height="70"/></a>
+The referral link offers you 10% off annual billing
+- <a href="https://app.hatchinvest.nz/"/><img src="https://pbs.twimg.com/media/D_jLsLLWkAwhg0p.png" height="50"/></a> 
+No referral system however it has Sharesight integration!
+- <a href="https://hellostake.com/referral-program?referrer=erwanj724"/><img src="https://www.moneyhub.co.nz/uploads/1/1/2/1/112100199/stake-review-trading_1.png?ezimgfmt=rs:350x162/rscb7/ng:webp/ngcb7" height="50"/></a>
+The referral link offers you a Gopro, Dropbox or Nike free stock! Sharesight can parse the email as a portfolio email
 
 ## How to build ##
 Ensure you have dotnet core 3.1 installed: https://dotnet.microsoft.com/download
