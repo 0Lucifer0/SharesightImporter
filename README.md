@@ -3,7 +3,7 @@
 This tool automatically add all of your Sharesies trades into a Sharesight portfolio.
 
 ## Referral Links ##
-If you are interested in investing from New Zealand here some referral links:
+If you are interested in investing from New Zealand here some useful referral links:
 - <a href="https://sharesies.nz/r/X99G4R"/><img src="https://static1.squarespace.com/static/58bc788c59cc68b9696b9ee0/t/5bfe00514ae23736655bacca/1591327857356/" height="45"/></a><br/>
 The referral link offers you $5.00
 - <a href="https://portfolio.sharesight.com/refer/CEM81"/><img src="https://www.sharesight.com/img/logos/logo-11a4fd04.svg" height="70"/></a><br/>
