@@ -16,14 +16,14 @@ namespace SharesiesToSharesight
         private readonly ILogger<Worker> _logger;
         private readonly ISharesightClient _sharesightClient;
         private readonly ISharesiesClient _sharesiesClient;
-        private readonly Configuration.Configuration _configuration;
+        private readonly SharesightTransactionConverter _sharesightTransactionConverter;
 
-        public Worker(ILogger<Worker> logger, ISharesiesClient sharesiesClient, ISharesightClient sharesightClient, Configuration.Configuration configuration)
+        public Worker(ILogger<Worker> logger, ISharesiesClient sharesiesClient, ISharesightClient sharesightClient,SharesightTransactionConverter sharesightTransactionConverter)
         {
             _logger = logger;
             _sharesiesClient = sharesiesClient;
             _sharesightClient = sharesightClient;
-            _configuration = configuration;
+            _sharesightTransactionConverter = sharesightTransactionConverter;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,52 +32,11 @@ namespace SharesiesToSharesight
             {
                 try
                 {
-                    var symbols = await _sharesiesClient.GetSymbolsAsync();
+                    _sharesightTransactionConverter.Symbols = await _sharesiesClient.GetSymbolsAsync();
                     var history = await _sharesiesClient.GetPaymentHistoryAsync();
                     for (var i = 0; i < history.Transactions.Length; i++)
                     {
-                        var transaction = history.Transactions[i];
-
-                        if (transaction.BuyOrder == null)
-                        {
-                            _logger.LogInformation("{0} transactions not supported", transaction.Reason);
-                            continue;
-                        }
-
-                        var trades = new List<TradePost>();
-                        if (transaction.BuyOrder.Trades.Any())
-                        {
-                            trades.AddRange(transaction.BuyOrder.Trades.Select(trade => new TradePost
-                            {
-                                Quantity = double.Parse(trade.Volume),
-                                Price = double.Parse(trade.SharePrice),
-                                TransactionDate = DateTimeOffset.FromUnixTimeMilliseconds(trade.TradeDatetime.Quantum),
-                                Brokerage = double.Parse(trade.CorporateFee),
-                                Market = transaction.BuyOrder.Mechanism.ToUpper(),
-                                PortfolioId = int.Parse(_configuration.SharesightClient.PortfolioId),
-                                BrokerageCurrencyCode = transaction.Currency.ToUpper(),
-                                Symbol = symbols[transaction.FundId].ToUpper(),
-                                TransactionType = transaction.BuyOrder.Type.ToUpper(),
-                                UniqueIdentifier = trade.ContractNoteNumber,
-                            }));
-                        }
-                        else
-                        {
-                            trades.Add(new TradePost
-                            {
-                                Quantity = double.Parse(transaction.BuyOrder.OrderShares),
-                                Price = double.Parse(transaction.BuyOrder.OrderUnitPrice),
-                                TransactionDate = DateTimeOffset.FromUnixTimeMilliseconds(transaction.Timestamp.Quantum),
-                                Brokerage = 0.00,
-                                Market = "NZX",
-                                PortfolioId = int.Parse(_configuration.SharesightClient.PortfolioId),
-                                BrokerageCurrencyCode = transaction.Currency.ToUpper(),
-                                Symbol = symbols[transaction.FundId].ToUpper(),
-                                TransactionType = transaction.BuyOrder.Type.ToUpper(),
-                                UniqueIdentifier = transaction.TransactionId.ToString(),
-                            });
-                        }
-
+                        var trades = _sharesightTransactionConverter.Convert(history.Transactions[i]);
                         foreach (var trade in trades)
                         {
                             if (await _sharesightClient.GetMatchingTransactionAsync(trade))
@@ -93,7 +52,7 @@ namespace SharesiesToSharesight
                             continue;
                         }
 
-                        history = await _sharesiesClient.GetPaymentHistoryAsync(transaction.TransactionId);
+                        history = await _sharesiesClient.GetPaymentHistoryAsync(history.Transactions[i].TransactionId);
                         i = 0;
                     }
                 }

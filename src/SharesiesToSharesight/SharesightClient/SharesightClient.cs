@@ -93,7 +93,7 @@ namespace SharesiesToSharesight.SharesightClient
                 _logger.LogDebug("Matching trade not found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                 return false;
             }
-            _logger.LogError("Retrieving transactions from sharesies failed", result.ReasonPhrase);
+            _logger.LogError("Retrieving trades from sharesies failed", result.ReasonPhrase);
             throw new ArgumentException();
         }
 
@@ -108,7 +108,7 @@ namespace SharesiesToSharesight.SharesightClient
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 IgnoreNullValues = true
             };
-            var tradeObj = new {Trade = trade};
+            var tradeObj = new { Trade = trade };
             var content = new StringContent(JsonSerializer.Serialize(tradeObj, options), Encoding.UTF8, "application/json");
 
             var result = await httpClient.PostAsync("api/v2/trades.json", content);
@@ -118,8 +118,8 @@ namespace SharesiesToSharesight.SharesightClient
                 return;
             }
 
-    _logger.LogError("Ading new trade to sharesight failed", result.ReasonPhrase);
+            _logger.LogError("Adding new trade to sharesight failed", result.ReasonPhrase);
             throw new ArgumentException();
-}
+        }
     }
 }

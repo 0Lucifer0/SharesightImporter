@@ -39,6 +39,7 @@ namespace SharesiesToSharesight
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton(configuration);
+                    services.AddTransient<SharesightTransactionConverter>();
                     services.AddHttpClient();
                     services.AddTransient<ISharesiesClient, SharesiesClient.SharesiesClient>();
                     services.AddTransient<ISharesightClient, SharesightClient.SharesightClient>();
