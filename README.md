@@ -14,10 +14,17 @@ The referral link offers you a Gopro, Dropbox or Nike free stock! Sharesight can
 
 ## How to build ? ##
 Ensure you have dotnet core 3.1 installed: https://dotnet.microsoft.com/download
-Run script/build.cmd
+> scripts/build.cmd
 
 ## How to run it ? ##
-Run script/run.cmd
+> scripts/run.cmd
+
+## Can I run it as a background task ? ##
+Yes you can! 
+> scripts/setup-service.cmd
+(this has to be ran as Administrator)
+It will automatically setup this tool as a windows service. 
+The Service will then automatically sync payments every one hour.
 
 ## How to use it ? ##
 To be able to use this soft you need to ask Sharesight API access. 
