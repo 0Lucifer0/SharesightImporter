@@ -34,15 +34,18 @@ namespace SharesiesToSharesight
                 {
                     _sharesightTransactionConverter.Symbols = await _sharesiesClient.GetSymbolsAsync();
                     var history = await _sharesiesClient.GetPaymentHistoryAsync();
+                    var tradeHistory = await _sharesightClient.GetTradeHistoryAsync();
                     for (var i = 0; i < history.Transactions.Length; i++)
                     {
                         var trades = _sharesightTransactionConverter.Convert(history.Transactions[i]);
                         foreach (var trade in trades)
                         {
-                            if (await _sharesightClient.GetMatchingTransactionAsync(trade))
+                            if (tradeHistory.Trades.Any(s => s.Symbol == trade.Symbol && s.Quantity == trade.Quantity && s.Price == trade.Price && s.TransactionDate.Date == trade.TransactionDate.Date))
                             {
+                                _logger.LogDebug("Matching trade found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                                 continue;
                             }
+                            _logger.LogDebug("Matching trade not found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                             await _sharesightClient.AddTradeAsync(trade);
                         }
 

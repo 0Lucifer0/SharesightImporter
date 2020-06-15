@@ -62,7 +62,7 @@ namespace SharesiesToSharesight.SharesightClient
             throw new ArgumentException();
         }
 
-        public async Task<bool> GetMatchingTransactionAsync(TradePost trade)
+        public async Task<TradeHistory> GetTradeHistoryAsync()
         {
             await LoginAsync();
             var httpClient = _clientFactory.CreateClient();
@@ -84,14 +84,7 @@ namespace SharesiesToSharesight.SharesightClient
                     PropertyNameCaseInsensitive = true
                 };
                 var resultJson = await result.Content.ReadAsStringAsync();
-                var tradeHistory = JsonSerializer.Deserialize<TradeHistory>(resultJson, options);
-                if (tradeHistory.Trades.Any(s => s.Symbol == trade.Symbol && s.Quantity == trade.Quantity && s.Price == trade.Price && s.TransactionDate.Date == trade.TransactionDate.Date))
-                {
-                    _logger.LogDebug("Matching trade found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
-                    return true;
-                }
-                _logger.LogDebug("Matching trade not found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
-                return false;
+                return JsonSerializer.Deserialize<TradeHistory>(resultJson, options);
             }
             _logger.LogError("Retrieving trades from sharesies failed", result.ReasonPhrase);
             throw new ArgumentException();
