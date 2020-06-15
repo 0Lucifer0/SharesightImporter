@@ -27,26 +27,27 @@ namespace SharesiesToSharesight
 
         public List<TradePost> Convert(Transaction transaction)
         {
-            if (transaction.BuyOrder == null)
+            if (transaction.BuyOrder == null && transaction.SellOrder == null)
             {
                 _logger.LogInformation("{0} transactions not supported", transaction.Reason);
                 return new List<TradePost>();
             }
 
             var trades = new List<TradePost>();
-            if (transaction.BuyOrder.Trades.Any())
+            var order = (transaction.BuyOrder ?? transaction.SellOrder);
+            if (order.Trades.Any())
             {
-                trades.AddRange(transaction.BuyOrder.Trades.Select(trade => new TradePost
+                trades.AddRange(order.Trades.Select(trade => new TradePost
                 {
                     Quantity = double.Parse(trade.Volume),
                     Price = double.Parse(trade.SharePrice),
                     TransactionDate = DateTimeOffset.FromUnixTimeMilliseconds(trade.TradeDatetime.Quantum),
                     Brokerage = double.Parse(trade.CorporateFee),
-                    Market = transaction.BuyOrder.Mechanism.ToUpper(),
+                    Market = order.Mechanism.ToUpper(),
                     PortfolioId = int.Parse(_configuration.SharesightClient.PortfolioId),
                     BrokerageCurrencyCode = transaction.Currency.ToUpper(),
                     Symbol = Symbols[transaction.FundId].ToUpper(),
-                    TransactionType = transaction.BuyOrder.Type.ToUpper(),
+                    TransactionType = order.Type.ToUpper(),
                     UniqueIdentifier = trade.ContractNoteNumber,
                 }));
             }
@@ -54,15 +55,15 @@ namespace SharesiesToSharesight
             {
                 trades.Add(new TradePost
                 {
-                    Quantity = double.Parse(transaction.BuyOrder.OrderShares),
-                    Price = double.Parse(transaction.BuyOrder.OrderUnitPrice),
+                    Quantity = double.Parse(order.OrderShares),
+                    Price = double.Parse(order.OrderUnitPrice),
                     TransactionDate = DateTimeOffset.FromUnixTimeMilliseconds(transaction.Timestamp.Quantum),
                     Brokerage = 0.00,
                     Market = "NZX",
                     PortfolioId = int.Parse(_configuration.SharesightClient.PortfolioId),
                     BrokerageCurrencyCode = transaction.Currency.ToUpper(),
                     Symbol = Symbols[transaction.FundId].ToUpper(),
-                    TransactionType = transaction.BuyOrder.Type.ToUpper(),
+                    TransactionType = order.Type.ToUpper(),
                     UniqueIdentifier = transaction.TransactionId.ToString(),
                 });
             }

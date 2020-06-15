@@ -12,7 +12,7 @@ namespace SharesiesToSharesight.SharesiesClient.Models
         public string Balance { get; set; } = null!;
 
         [JsonPropertyName("buy_order")]
-        public BuyOrder BuyOrder { get; set; } = null!;
+        public Order BuyOrder { get; set; } = null!;
 
         [JsonPropertyName("csn_transfer_order")]
         public object CsnTransferOrder { get; set; } = null!;
@@ -42,7 +42,7 @@ namespace SharesiesToSharesight.SharesiesClient.Models
         public string Reason { get; set; } = null!;
 
         [JsonPropertyName("sell_order")]
-        public object SellOrder { get; set; } = null!;
+        public Order SellOrder { get; set; } = null!;
 
         [JsonPropertyName("timestamp")]
         public Timestamp Timestamp { get; set; } = null!;

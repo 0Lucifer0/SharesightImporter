@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SharesiesToSharesight.SharesiesClient.Models
 {
-    public class BuyOrder
+    public class Order
     {
         [JsonPropertyName("autoinvest")]
         public bool Autoinvest { get; set; }
