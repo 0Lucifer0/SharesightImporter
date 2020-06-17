@@ -29,6 +29,7 @@ namespace SharesiesToSharesight
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .CreateLogger();
             return Host.CreateDefaultBuilder(args)
+                .UseWindowsService()
                 .ConfigureLogging(
                     loggingBuilder =>
                     {
