@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SharesightImporter.SharesiesClient.Models;
+using SharesightImporter.Exporter.SharesiesExporter.Models;
 
-namespace SharesightImporter.SharesiesClient
+namespace SharesightImporter.Exporter.SharesiesExporter
 {
-    public interface ISharesiesClient
+    public interface ISharesiesExporterClient : IExporterClient
     {
         public Task LoginAsync();
         public Task<TransactionHistory> GetPaymentHistoryAsync();

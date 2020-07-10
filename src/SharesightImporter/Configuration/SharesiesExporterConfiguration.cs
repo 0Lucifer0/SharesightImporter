@@ -2,7 +2,7 @@
 
 namespace SharesightImporter.Configuration
 {
-    public class SharesiesClientConfiguration
+    public class SharesiesExporterConfiguration : ExporterConfiguration
     {
         [Required] 
         public string Email { get; set; } = null!;

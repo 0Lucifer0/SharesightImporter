@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,19 +8,24 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using SharesightImporter.SharesiesClient.Models;
+using SharesightImporter.Configuration;
+using SharesightImporter.Exporter.SharesiesExporter.Models;
+using SharesightImporter.SharesightClient.Models;
 
-namespace SharesightImporter.SharesiesClient
+namespace SharesightImporter.Exporter.SharesiesExporter
 {
-    public class SharesiesClient : ISharesiesClient
+    public class SharesiesExporterClient : ISharesiesExporterClient
     {
+        public string PortfolioId => _configuration.PortfolioId;
         private readonly IHttpClientFactory _clientFactory;
-        private readonly ILogger<SharesiesClient> _logger;
+        private readonly ILogger<SharesiesExporterClient> _logger;
         private readonly Uri _uri = new Uri("https://app.sharesies.nz/api/");
         private CookieContainer _cookies = new CookieContainer();
-        private readonly Configuration.Configuration _configuration;
+        private readonly SharesiesExporterConfiguration _configuration;
         private string? _userId = null;
-        public SharesiesClient(IHttpClientFactory clientFactory, ILogger<SharesiesClient> logger, Configuration.Configuration configuration)
+
+
+        public SharesiesExporterClient(IHttpClientFactory clientFactory, ILogger<SharesiesExporterClient> logger, SharesiesExporterConfiguration configuration)
         {
             _clientFactory = clientFactory;
             _logger = logger;
@@ -46,8 +49,8 @@ namespace SharesightImporter.SharesiesClient
             };
             var content = new StringContent(JsonSerializer.Serialize(new
             {
-                _configuration.SharesiesClient.Email,
-                _configuration.SharesiesClient.Password,
+                _configuration.Email,
+                _configuration.Password,
                 Remember = true
             }, options), Encoding.UTF8, "application/json");
 
@@ -117,6 +120,80 @@ namespace SharesightImporter.SharesiesClient
             }
             _logger.LogError("Retrieving funds from sharesies failed", result.ReasonPhrase);
             throw new ArgumentException();
+        }
+
+        private List<TradePost> Convert(Transaction transaction)
+        {
+            if (transaction.BuyOrder == null && transaction.SellOrder == null)
+            {
+                _logger.LogInformation("{0} transactions not supported", transaction.Reason);
+                return new List<TradePost>();
+            }
+
+            var trades = new List<TradePost>();
+            var order = (transaction.BuyOrder ?? transaction.SellOrder);
+            if (order.State == "cancelled")
+            {
+                _logger.LogInformation("cancelled transactions not supported", transaction.Reason);
+                return new List<TradePost>();
+            }
+            if (order.Trades.Any())
+            {
+                trades.AddRange(order.Trades.Select(trade => new TradePost
+                {
+                    Quantity = double.Parse(trade.Volume),
+                    Price = double.Parse(trade.SharePrice),
+                    TransactionDate = DateTimeOffset.FromUnixTimeMilliseconds(trade.TradeDatetime.Quantum),
+                    Brokerage = double.Parse(trade.CorporateFee),
+                    Market = order.Mechanism.ToUpper(),
+                    PortfolioId = int.Parse(_configuration.PortfolioId),
+                    BrokerageCurrencyCode = transaction.Currency.ToUpper(),
+                    Symbol = Symbols[transaction.FundId].ToUpper(),
+                    TransactionType = order.Type.ToUpper(),
+                    UniqueIdentifier = trade.ContractNoteNumber,
+                }));
+            }
+            else
+            {
+                trades.Add(new TradePost
+                {
+                    Quantity = double.Parse(order.OrderShares),
+                    Price = double.Parse(order.OrderUnitPrice),
+                    TransactionDate = DateTimeOffset.FromUnixTimeMilliseconds(transaction.Timestamp.Quantum),
+                    Brokerage = 0.00,
+                    Market = "NZX",
+                    PortfolioId = int.Parse(_configuration.PortfolioId),
+                    BrokerageCurrencyCode = transaction.Currency.ToUpper(),
+                    Symbol = Symbols[transaction.FundId].ToUpper(),
+                    TransactionType = order.Type.ToUpper(),
+                    UniqueIdentifier = transaction.TransactionId.ToString(),
+                });
+            }
+
+            return trades;
+        }
+
+        private Dictionary<Guid, string> Symbols { get; set; }
+
+        public async Task<List<TradePost>> GetTrades()
+        {
+            var result = new List<TradePost>();
+            Symbols = await GetSymbolsAsync();
+            var history = await GetPaymentHistoryAsync();
+
+            for (var i = 0; i < history.Transactions.Length; i++)
+            {
+                result.AddRange(Convert(history.Transactions[i]));
+                if (i != history.Transactions.Length - 1 || !history.HasMore)
+                {
+                    continue;
+                }
+
+                history = await GetPaymentHistoryAsync(history.Transactions[i].TransactionId);
+                i = -1;
+            }
+
+            return result;
         }
     }
 }

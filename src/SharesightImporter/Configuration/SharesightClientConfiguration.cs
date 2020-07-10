@@ -9,8 +9,5 @@ namespace SharesightImporter.Configuration
 
         [Required]
         public string ClientSecret { get; set; } = null!;
-
-        [Required]
-        public string PortfolioId { get; set; } = null!;
     }
 }

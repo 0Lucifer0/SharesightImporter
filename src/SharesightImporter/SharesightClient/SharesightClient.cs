@@ -62,7 +62,7 @@ namespace SharesightImporter.SharesightClient
             throw new ArgumentException();
         }
 
-        public async Task<TradeHistory> GetTradeHistoryAsync()
+        public async Task<TradeHistory> GetTradeHistoryAsync(string portfolioId)
         {
             await LoginAsync();
             var httpClient = _clientFactory.CreateClient();
@@ -70,7 +70,7 @@ namespace SharesightImporter.SharesightClient
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token!.AccessToken);
             var content = new Dictionary<string, string>
             {
-                {"portfolio_id", _configuration.SharesightClient.PortfolioId},
+                {"portfolio_id", portfolioId},
                 //{"start_date ", ""},
                 //{"start_date ", ""}
                 //{"unique_identifier", ""}

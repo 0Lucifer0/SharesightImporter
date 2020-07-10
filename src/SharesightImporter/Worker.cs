@@ -5,7 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SharesightImporter.SharesiesClient;
+using SharesightImporter.Configuration;
+using SharesightImporter.Exporter;
 using SharesightImporter.SharesightClient;
 using SharesightImporter.SharesightClient.Models;
 
@@ -15,15 +16,13 @@ namespace SharesightImporter
     {
         private readonly ILogger<Worker> _logger;
         private readonly ISharesightClient _sharesightClient;
-        private readonly ISharesiesClient _sharesiesClient;
-        private readonly SharesightTransactionConverter _sharesightTransactionConverter;
+        private readonly IEnumerable<IExporterClient> _exporters;
 
-        public Worker(ILogger<Worker> logger, ISharesiesClient sharesiesClient, ISharesightClient sharesightClient,SharesightTransactionConverter sharesightTransactionConverter)
+        public Worker(ILogger<Worker> logger, IEnumerable<IExporterClient> exporters, ISharesightClient sharesightClient)
         {
             _logger = logger;
-            _sharesiesClient = sharesiesClient;
+            _exporters = exporters;
             _sharesightClient = sharesightClient;
-            _sharesightTransactionConverter = sharesightTransactionConverter;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,12 +31,11 @@ namespace SharesightImporter
             {
                 try
                 {
-                    _sharesightTransactionConverter.Symbols = await _sharesiesClient.GetSymbolsAsync();
-                    var history = await _sharesiesClient.GetPaymentHistoryAsync();
-                    var tradeHistory = await _sharesightClient.GetTradeHistoryAsync();
-                    for (var i = 0; i < history.Transactions.Length; i++)
+                    foreach(var exporter in _exporters.ToList())
                     {
-                        var trades = _sharesightTransactionConverter.Convert(history.Transactions[i]);
+                        var tradeHistory = await _sharesightClient.GetTradeHistoryAsync(exporter.PortfolioId);
+
+                        var trades = await exporter.GetTrades();
                         foreach (var trade in trades)
                         {
                             if (tradeHistory.Trades.Any(s => s.Symbol == trade.Symbol && s.Quantity == trade.Quantity && s.Price == trade.Price && s.TransactionDate.Date == trade.TransactionDate.Date))
@@ -48,15 +46,6 @@ namespace SharesightImporter
                             _logger.LogDebug("Matching trade not found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                             await _sharesightClient.AddTradeAsync(trade);
                         }
-
-
-                        if (i != history.Transactions.Length - 1 || !history.HasMore)
-                        {
-                            continue;
-                        }
-
-                        history = await _sharesiesClient.GetPaymentHistoryAsync(history.Transactions[i].TransactionId);
-                        i = 0;
                     }
                 }
                 catch (Exception ex)

@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace SharesightImporter.SharesiesClient.Models
+namespace SharesightImporter.Exporter.SharesiesExporter.Models
 {
     public class Fund
     {

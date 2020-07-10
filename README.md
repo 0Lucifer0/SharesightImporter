@@ -35,15 +35,16 @@ then just fill the config file
 config.yml
 ```
 
-Exporter:
-	Sharesies:
-	  ExporeterType: 'Sharesies'
-	  Email: ''
-	  Password: ''
-	Ethereum:
-	  - YourEthWalletAddress
+Exporters:
+- ExporterType: Sharesies
+  Email: ''
+  Password: ''
+  PortfolioId: ''
+- ExporterType: Ethereum
+  Address:
+  - ''
+  PortfolioId: ''
 SharesightClient:
   CliendId: ''
   ClientSecret: ''
-  PortfolioId: ''
 ```

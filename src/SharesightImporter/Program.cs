@@ -1,11 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
-using SharesightImporter.SharesiesClient;
+using SharesightImporter.Configuration;
+using SharesightImporter.Exporter;
+using SharesightImporter.Exporter.SharesiesExporter;
 using SharesightImporter.SharesightClient;
 
 namespace SharesightImporter
@@ -20,8 +25,10 @@ namespace SharesightImporter
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             var configuration = new Configuration.Configuration();
-            new ConfigurationBuilder().AddYamlFile("config.yml").Build().Bind(configuration);
+            var config = new ConfigurationBuilder().AddYamlFile("config.yml").Build();
+            config.Bind(configuration);
             Validator.ValidateObject(configuration, new ValidationContext(configuration), true);
+
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Console(outputTemplate: "{Level:u4} {Timestamp:HH:mm:ss} -- {Message:lj}{NewLine}{Exception}")
@@ -40,12 +47,41 @@ namespace SharesightImporter
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton(configuration);
-                    services.AddTransient<SharesightTransactionConverter>();
                     services.AddHttpClient();
-                    services.AddTransient<ISharesiesClient, SharesiesClient.SharesiesClient>();
+                    foreach (Type type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
+                        .Where(mytype => mytype.GetInterfaces().Contains(typeof(IExporterClient))))
+                    {
+                        var name = type.Name.Replace("ExporterClient", "");
+                        var isDefined =
+                            Enum.IsDefined(typeof(ExporterType), name);
+                        if (!isDefined)
+                        {
+                            continue;
+                        }
+                        var anyExporter = configuration.Exporters.Any(s =>
+                             s.ExporterType.ToString() == name);
+                        if (!anyExporter)
+                        {
+                            continue;
+                        }
+
+                        switch (name)
+                        {
+                            case nameof(ExporterType.Ethereum):
+                                break;
+                            case nameof(ExporterType.Sharesies):
+                                var sharesiesConf = new SharesiesExporterConfiguration();
+                                config.GetSection("Exporters").GetChildren().FirstOrDefault(s => s.GetValue<string>(nameof(ExporterType)) == name).Bind(sharesiesConf);
+                                Validator.ValidateObject(sharesiesConf, new ValidationContext(sharesiesConf), true);
+                                services.AddSingleton(sharesiesConf);
+                                break;
+                        }
+
+                        services.Add(new ServiceDescriptor(typeof(IExporterClient), type, ServiceLifetime.Transient));
+                    }
                     services.AddTransient<ISharesightClient, SharesightClient.SharesightClient>();
                     services.AddHostedService<Worker>();
-                }); 
+                });
         }
     }
 }

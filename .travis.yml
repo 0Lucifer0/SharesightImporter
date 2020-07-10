@@ -20,8 +20,8 @@ env:
 jobs:
   include:
     - stage: test_unit_testing
-      name: Run tests on SharesiesToSharesight
+      name: Run tests on SharesightImporter
       script:
         - dotnet restore
         - dotnet build
-        - dotnet test test/SharesiesToSharesight.Tests -v m
+        - dotnet test test/SharesightImporter.Tests -v m

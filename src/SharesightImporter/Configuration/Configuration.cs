@@ -1,13 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SharesightImporter.Configuration
 {
     public class Configuration
     {
         [Required]
-        public SharesiesClientConfiguration SharesiesClient { get; set; } = null!;
+        public SharesightClientConfiguration SharesightClient { get; set; } = null!;
 
         [Required]
-        public SharesightClientConfiguration SharesightClient { get; set; } = null!;
+        public List<ExporterConfiguration> Exporters { get; set; } = null!;
     }
 }
