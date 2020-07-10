@@ -1,6 +1,6 @@
-# Sharesies To Sharesight #
+# Sharesight Importer #
 [![Travis build status](https://travis-ci.org/0Lucifer0/SharesiesToSharesight.svg?branch=master)](https://travis-ci.org/0Lucifer0/SharesiesToSharesight)<br/>
-This tool automatically add all of your Sharesies trades into a Sharesight portfolio.
+This tool automatically add all of your trades into a Sharesight portfolio.
 
 ## Referral Links ##
 If you are interested in investing from New Zealand here some useful referral links:
@@ -34,9 +34,14 @@ then just fill the config file
 
 config.yml
 ```
-SharesiesClient:
-  Email: ''
-  Password: ''
+
+Exporter:
+	Sharesies:
+	  ExporeterType: 'Sharesies'
+	  Email: ''
+	  Password: ''
+	Ethereum:
+	  - YourEthWalletAddress
 SharesightClient:
   CliendId: ''
   ClientSecret: ''

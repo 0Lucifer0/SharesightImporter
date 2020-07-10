@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharesightImporter", "src\SharesiesToSharesight\SharesightImporter.csproj", "{9B71EBA0-D169-434B-A073-065DBCE0DA4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharesightImporter", "src\SharesightImporter\SharesightImporter.csproj", "{9B71EBA0-D169-434B-A073-065DBCE0DA4E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharesightImporter.Tests", "test\SharesiesToSharesight.Tests\SharesightImporter.Tests.csproj", "{D45929C7-77D4-46E4-A7B6-A5D6F651B21B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharesightImporter.Tests", "test\SharesightImporter.Tests\SharesightImporter.Tests.csproj", "{D45929C7-77D4-46E4-A7B6-A5D6F651B21B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
