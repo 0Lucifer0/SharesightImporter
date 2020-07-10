@@ -65,13 +65,19 @@ namespace SharesightImporter
                             continue;
                         }
 
+                        var secConf = config.GetSection("Exporters").GetChildren()
+                            .FirstOrDefault(s => s.GetValue<string>(nameof(ExporterType)) == name);
                         switch (name)
                         {
                             case nameof(ExporterType.Ethereum):
+                                var ethConf = new EthereumExporterConfiguration();
+                                secConf.Bind(ethConf);
+                                Validator.ValidateObject(ethConf, new ValidationContext(ethConf), true);
+                                services.AddSingleton(ethConf);
                                 break;
                             case nameof(ExporterType.Sharesies):
                                 var sharesiesConf = new SharesiesExporterConfiguration();
-                                config.GetSection("Exporters").GetChildren().FirstOrDefault(s => s.GetValue<string>(nameof(ExporterType)) == name).Bind(sharesiesConf);
+                                secConf.Bind(sharesiesConf);
                                 Validator.ValidateObject(sharesiesConf, new ValidationContext(sharesiesConf), true);
                                 services.AddSingleton(sharesiesConf);
                                 break;

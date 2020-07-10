@@ -1,3 +1,3 @@
-net stop SharesiesToSharesight
+net stop SharesightImporter
 taskkill /F /IM mmc.exe
-sc.exe delete SharesiesToSharesight
+sc.exe delete SharesightImporter

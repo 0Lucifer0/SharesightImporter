@@ -41,7 +41,8 @@ Exporters:
   Password: ''
   PortfolioId: ''
 - ExporterType: Ethereum
-  Address:
+  EtherscanApiKey: ''
+  Addresses:
   - ''
   PortfolioId: ''
 SharesightClient:
