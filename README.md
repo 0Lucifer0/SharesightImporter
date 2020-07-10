@@ -13,6 +13,10 @@ $10 when depositing $100 or more
 - <a href="https://hellostake.com/referral-program?referrer=erwanj724"/><img src="https://www.moneyhub.co.nz/uploads/1/1/2/1/112100199/stake-review-trading_1.png?ezimgfmt=rs:350x162/rscb7/ng:webp/ngcb7" height="50"/></a><br/>
 The referral link offers you a Gopro, Dropbox or Nike free stock! Sharesight can parse the email as a portfolio email
 
+## What is currently supported ? ##
+Ethereum wallet (Etherscan api)
+Sharesies wallet
+
 ## How to build ? ##
 Ensure you have dotnet core 3.1 installed: https://dotnet.microsoft.com/download
 > scripts/build.cmd
@@ -30,7 +34,7 @@ The Service will then automatically sync payments every one hour.
 
 ## How to use it ? ##
 To be able to use this soft you need to ask Sharesight API access. 
-then just fill the config file
+then just fill the config file with at least one Exporter
 
 config.yml
 ```
