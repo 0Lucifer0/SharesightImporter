@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace SharesiesToSharesight.SharesightClient.Models
+namespace SharesightImporter.SharesightClient.Models
 {
 
     public class TradeHistory

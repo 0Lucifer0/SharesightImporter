@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SharesiesToSharesight.Configuration
+namespace SharesightImporter.Configuration
 {
     public class Configuration
     {

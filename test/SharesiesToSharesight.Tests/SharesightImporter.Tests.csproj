@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SharesiesToSharesight\SharesiesToSharesight.csproj" />
+    <ProjectReference Include="..\..\src\SharesightImporter\SharesightImporter.csproj" />
   </ItemGroup>
 
 </Project>

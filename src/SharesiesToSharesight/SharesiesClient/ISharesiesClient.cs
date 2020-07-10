@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SharesiesToSharesight.SharesiesClient.Models;
+using SharesightImporter.SharesiesClient.Models;
 
-namespace SharesiesToSharesight.SharesiesClient
+namespace SharesightImporter.SharesiesClient
 {
     public interface ISharesiesClient
     {

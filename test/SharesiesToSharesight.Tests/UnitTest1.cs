@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SharesiesToSharesight.Tests
+namespace SharesightImporter.Tests
 {
     [TestClass]
     public class UnitTest1

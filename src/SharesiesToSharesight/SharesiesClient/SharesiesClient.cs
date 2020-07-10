@@ -10,9 +10,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using SharesiesToSharesight.SharesiesClient.Models;
+using SharesightImporter.SharesiesClient.Models;
 
-namespace SharesiesToSharesight.SharesiesClient
+namespace SharesightImporter.SharesiesClient
 {
     public class SharesiesClient : ISharesiesClient
     {

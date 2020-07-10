@@ -5,12 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SharesiesToSharesight.SharesiesClient;
-using SharesiesToSharesight.SharesiesClient.Models;
-using SharesiesToSharesight.SharesightClient;
-using SharesiesToSharesight.SharesightClient.Models;
+using SharesightImporter.SharesiesClient;
+using SharesightImporter.SharesiesClient.Models;
+using SharesightImporter.SharesightClient;
+using SharesightImporter.SharesightClient.Models;
 
-namespace SharesiesToSharesight
+namespace SharesightImporter
 {
     public class SharesightTransactionConverter
     {

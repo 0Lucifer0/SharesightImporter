@@ -1,7 +1,7 @@
-using SharesiesToSharesight.SharesightClient.Models;
+using SharesightImporter.SharesightClient.Models;
 using System.Threading.Tasks;
 
-namespace SharesiesToSharesight.SharesightClient
+namespace SharesightImporter.SharesightClient
 {
     public interface ISharesightClient
     {

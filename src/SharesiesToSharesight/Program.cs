@@ -5,10 +5,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
-using SharesiesToSharesight.SharesiesClient;
-using SharesiesToSharesight.SharesightClient;
+using SharesightImporter.SharesiesClient;
+using SharesightImporter.SharesightClient;
 
-namespace SharesiesToSharesight
+namespace SharesightImporter
 {
     class Program
     {

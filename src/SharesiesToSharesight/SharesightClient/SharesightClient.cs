@@ -8,9 +8,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using SharesiesToSharesight.SharesightClient.Models;
+using SharesightImporter.SharesightClient.Models;
 
-namespace SharesiesToSharesight.SharesightClient
+namespace SharesightImporter.SharesightClient
 {
     public class SharesightClient : ISharesightClient
     {
