@@ -1,5 +1,5 @@
 # Sharesight Importer #
-[![Travis build status](https://travis-ci.org/0Lucifer0/SharesiesToSharesight.svg?branch=master)](https://travis-ci.org/0Lucifer0/SharesiesToSharesight)<br/>
+[![Travis build status](https://travis-ci.org/0Lucifer0/SharesightImporter.svg?branch=master)](https://travis-ci.org/0Lucifer0/SharesightImporter)<br/>
 This tool automatically add all of your trades into a Sharesight portfolio.
 
 ## Referral Links ##
