@@ -38,7 +38,7 @@ namespace SharesightImporter
                         var trades = await exporter.GetTrades();
                         foreach (var trade in trades)
                         {
-                            if (tradeHistory.Trades.Any(s => s.Symbol == trade.Symbol && s.Quantity == trade.Quantity && s.Price == trade.Price && s.TransactionDate.Date == trade.TransactionDate.Date))
+                            if (tradeHistory.Trades.Any(s => (s.UniqueIdentifier == trade.UniqueIdentifier && trade.UniqueIdentifier != null) || (s.Symbol == trade.Symbol && s.Quantity == trade.Quantity && s.Price == trade.Price && s.TransactionDate.Date == trade.TransactionDate.Date)))
                             {
                                 _logger.LogDebug("Matching trade found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                                 continue;
