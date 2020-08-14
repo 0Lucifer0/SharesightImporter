@@ -51,6 +51,7 @@ namespace SharesightImporter.Exporter.EthereumExporter
                         BrokerageCurrencyCode = "ETH",
                         TransactionType = isSell ? "SELL" : "BUY",
                         UniqueIdentifier = transaction.TxId,
+                        Brokerage = double.Parse(transaction.gasUsed) * double.Parse(transaction.gasPrice) / 1000000000000000000
                     });
                 }
             }
