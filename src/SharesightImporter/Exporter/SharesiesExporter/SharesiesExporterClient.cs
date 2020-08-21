@@ -23,6 +23,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
         private CookieContainer _cookies = new CookieContainer();
         private readonly SharesiesExporterConfiguration _configuration;
         private string? _userId = null;
+        private string? _bearer;
 
 
         public SharesiesExporterClient(IHttpClientFactory clientFactory, ILogger<SharesiesExporterClient> logger, SharesiesExporterConfiguration configuration)
@@ -57,8 +58,10 @@ namespace SharesightImporter.Exporter.SharesiesExporter
             var result = await httpClient.PostAsync("identity/login", content);
             if (result.IsSuccessStatusCode)
             {
-                var user = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(
-                    await result.Content.ReadAsStringAsync())["user"].ToString();
+                var resultdic = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(
+                    await result.Content.ReadAsStringAsync());
+                var user = resultdic["user"].ToString();
+                _bearer = resultdic["distill_token"].ToString();
                 _userId = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(user)["id"].ToString();
                 _logger.LogInformation("Connected to sharesies!");
                 foreach (var cookie in result.Headers.First(s => s.Key.Equals("Set-Cookie", StringComparison.CurrentCultureIgnoreCase)).Value)
@@ -104,19 +107,31 @@ namespace SharesightImporter.Exporter.SharesiesExporter
             throw new ArgumentException();
         }
 
-        public async Task<Dictionary<Guid, string>> GetSymbolsAsync()
+        public async Task<Dictionary<Guid, Instrument>> GetInstrumentsAsync(List<Guid> instrumentsId)
         {
+            await LoginAsync();
             var httpClient = _clientFactory.CreateClient();
-            httpClient.BaseAddress = _uri;
-            var result = await httpClient.GetAsync("fund/list");
+            httpClient.DefaultRequestHeaders.Add("authorization", $"Bearer {_bearer}");
+            httpClient.BaseAddress = new Uri("https://data.sharesies.nz/api/v1/");
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNameCaseInsensitive = true
+            };
+            var content = new StringContent(JsonSerializer.Serialize(new InstrumentInput
+            {
+                Page = 1,
+                Instruments = instrumentsId.Select(s => s.ToString()).ToList(),
+                PriceChangeTime = "1y",
+                Query = "",
+                Sort = "name"
+            }, options), Encoding.UTF8, "application/json");
+
+            var result = await httpClient.PostAsync("instruments", content);
             if (result.IsSuccessStatusCode)
             {
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
                 var resultJson = await result.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<FundList>(resultJson, options).Funds.ToDictionary(s => s.Id, s => s.Code);
+                return JsonSerializer.Deserialize<InstrumentResult>(resultJson, options).Instruments.ToDictionary(s => s.Id, s => s);
             }
             _logger.LogError("Retrieving funds from sharesies failed", result.ReasonPhrase);
             throw new ArgumentException();
@@ -145,10 +160,10 @@ namespace SharesightImporter.Exporter.SharesiesExporter
                     Price = double.Parse(trade.SharePrice),
                     TransactionDate = DateTimeOffset.FromUnixTimeMilliseconds(trade.TradeDatetime.Quantum),
                     Brokerage = double.Parse(trade.CorporateFee),
-                    Market = order.Mechanism.ToUpper(),
+                    Market = Instruments[transaction.FundId].Exchange,
                     PortfolioId = int.Parse(_configuration.PortfolioId),
                     BrokerageCurrencyCode = transaction.Currency.ToUpper(),
-                    Symbol = Symbols[transaction.FundId].ToUpper(),
+                    Symbol = Instruments[transaction.FundId].Symbol.ToUpper(),
                     TransactionType = order.Type.ToUpper(),
                     UniqueIdentifier = trade.ContractNoteNumber,
                 }));
@@ -161,10 +176,10 @@ namespace SharesightImporter.Exporter.SharesiesExporter
                     Price = double.Parse(order.OrderUnitPrice),
                     TransactionDate = DateTimeOffset.FromUnixTimeMilliseconds(transaction.Timestamp.Quantum),
                     Brokerage = 0.00,
-                    Market = "NZX",
+                    Market = Instruments[transaction.FundId].Exchange,
                     PortfolioId = int.Parse(_configuration.PortfolioId),
                     BrokerageCurrencyCode = transaction.Currency.ToUpper(),
-                    Symbol = Symbols[transaction.FundId].ToUpper(),
+                    Symbol = Instruments[transaction.FundId].Symbol.ToUpper(),
                     TransactionType = order.Type.ToUpper(),
                     UniqueIdentifier = transaction.TransactionId.ToString(),
                 });
@@ -173,14 +188,13 @@ namespace SharesightImporter.Exporter.SharesiesExporter
             return trades;
         }
 
-        private Dictionary<Guid, string> Symbols { get; set; }
+        private Dictionary<Guid, Instrument> Instruments { get; set; }
 
         public async Task<List<TradePost>> GetTrades()
         {
             var result = new List<TradePost>();
-            Symbols = await GetSymbolsAsync();
             var history = await GetPaymentHistoryAsync();
-
+            Instruments = await GetInstrumentsAsync(history.Transactions.Select(s=>s.FundId).ToList());
             for (var i = 0; i < history.Transactions.Length; i++)
             {
                 result.AddRange(Convert(history.Transactions[i]));
@@ -190,6 +204,15 @@ namespace SharesightImporter.Exporter.SharesiesExporter
                 }
 
                 history = await GetPaymentHistoryAsync(history.Transactions[i].TransactionId);
+                var missing = history.Transactions.Select(s => s.FundId).Except(Instruments.Keys).Where(s=>s != Guid.Empty).ToList();
+                if (missing.Any())
+                {
+                    var missinginstruments = await GetInstrumentsAsync(missing.ToList());
+                    foreach (var instr in missinginstruments)
+                    {
+                        Instruments.Add(instr.Key, instr.Value);
+                    }
+                }
                 i = -1;
             }
 

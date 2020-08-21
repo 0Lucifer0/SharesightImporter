@@ -5,24 +5,24 @@ namespace SharesightImporter.Exporter.SharesiesExporter.Models
     public class ComparisonPrices
     {
         [JsonPropertyName("1d")]
-        public string The1D { get; set; } = null!;
+        public object The1D { get; set; }
 
         [JsonPropertyName("1m")]
-        public string The1M { get; set; } = null!;
+        public object The1M { get; set; }
 
         [JsonPropertyName("1w")]
-        public string The1W { get; set; } = null!;
+        public object The1W { get; set; }
 
         [JsonPropertyName("1y")]
-        public string? The1Y { get; set; } = null!;
+        public object The1Y { get; set; }
 
         [JsonPropertyName("3m")]
-        public string The3M { get; set; } = null!;
+        public object The3M { get; set; }
 
         [JsonPropertyName("5y")]
-        public string? The5Y { get; set; }
+        public object The5Y { get; set; }
 
         [JsonPropertyName("6m")]
-        public string The6M { get; set; } = null!;
+        public object The6M { get; set; }
     }
 }

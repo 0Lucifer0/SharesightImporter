@@ -10,6 +10,6 @@ namespace SharesightImporter.Exporter.SharesiesExporter
         public Task LoginAsync();
         public Task<TransactionHistory> GetPaymentHistoryAsync();
         public Task<TransactionHistory> GetPaymentHistoryAsync(long? beforeId);
-        public Task<Dictionary<Guid, string>> GetSymbolsAsync();
+        public Task<Dictionary<Guid, Instrument>> GetInstrumentsAsync(List<Guid> instrumentsId);
     }
 }
