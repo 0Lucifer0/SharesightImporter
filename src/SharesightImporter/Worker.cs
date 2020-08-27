@@ -52,7 +52,7 @@ namespace SharesightImporter
                 {
                     _logger.LogError(ex.Message, ex);
                 }
-
+                _logger.LogInformation("All trades imported!");
                 await Task.Delay((int)TimeSpan.FromHours(1).TotalMilliseconds, stoppingToken);
             }
         }

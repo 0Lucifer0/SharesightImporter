@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
         private readonly SharesiesExporterConfiguration _configuration;
         private string? _userId = null;
         private string? _bearer;
+        private DateTime _bearerRefresh = default!;
 
 
         public SharesiesExporterClient(IHttpClientFactory clientFactory, ILogger<SharesiesExporterClient> logger, SharesiesExporterConfiguration configuration)
@@ -35,15 +37,34 @@ namespace SharesightImporter.Exporter.SharesiesExporter
 
         public async Task LoginAsync()
         {
-            if (_cookies.Count > 0 && !_cookies.GetCookies(_uri).ToList().Any(s => s.Expired))
-            {
-                _logger.LogTrace("Using sharesies cached session");
-                return;
-            }
-            _cookies = new CookieContainer();
             _logger.LogInformation("Connecting to sharesies...");
             var httpClient = _clientFactory.CreateClient();
             httpClient.BaseAddress = _uri;
+
+            if (_cookies.Count > 0 && !_cookies.GetCookies(_uri).ToList().Any(s => s.Expired))
+            {
+                _logger.LogTrace("Using sharesies cached session");
+                if ((DateTime.Now - _bearerRefresh).TotalMinutes > 10)
+                {
+                    var res = await httpClient.GetAsync("identity/check");
+                    httpClient.DefaultRequestHeaders.Add("Cookie", _cookies.GetCookieHeader(_uri));
+                    if (res.IsSuccessStatusCode)
+                    {
+                        var resultdic = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(
+                            await res.Content.ReadAsStringAsync());
+                        _bearer = resultdic["distill_token"].ToString();
+                        _bearerRefresh = DateTime.Now;
+                        _logger.LogInformation("Updated bearer token");
+                        return;
+                    }
+                    _logger.LogError("Sharesies token refresh failed");
+                    throw new ArgumentException();
+                }
+                return;
+            }
+
+
+            _cookies = new CookieContainer();
             var options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -62,6 +83,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
                     await result.Content.ReadAsStringAsync());
                 var user = resultdic["user"].ToString();
                 _bearer = resultdic["distill_token"].ToString();
+                _bearerRefresh = DateTime.Now;
                 _userId = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(user)["id"].ToString();
                 _logger.LogInformation("Connected to sharesies!");
                 foreach (var cookie in result.Headers.First(s => s.Key.Equals("Set-Cookie", StringComparison.CurrentCultureIgnoreCase)).Value)
@@ -111,7 +133,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
         {
             await LoginAsync();
             var httpClient = _clientFactory.CreateClient();
-            httpClient.DefaultRequestHeaders.Add("authorization", $"Bearer {_bearer}");
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearer);
             httpClient.BaseAddress = new Uri("https://data.sharesies.nz/api/v1/");
             var options = new JsonSerializerOptions
             {
@@ -188,13 +210,13 @@ namespace SharesightImporter.Exporter.SharesiesExporter
             return trades;
         }
 
-        private Dictionary<Guid, Instrument> Instruments { get; set; }
+        private Dictionary<Guid, Instrument> Instruments { get; set; } = default!;
 
         public async Task<List<TradePost>> GetTrades()
         {
             var result = new List<TradePost>();
             var history = await GetPaymentHistoryAsync();
-            Instruments = await GetInstrumentsAsync(history.Transactions.Select(s=>s.FundId).ToList());
+            Instruments = await GetInstrumentsAsync(history.Transactions.Select(s => s.FundId).ToList());
             for (var i = 0; i < history.Transactions.Length; i++)
             {
                 result.AddRange(Convert(history.Transactions[i]));
@@ -204,7 +226,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
                 }
 
                 history = await GetPaymentHistoryAsync(history.Transactions[i].TransactionId);
-                var missing = history.Transactions.Select(s => s.FundId).Except(Instruments.Keys).Where(s=>s != Guid.Empty).ToList();
+                var missing = history.Transactions.Select(s => s.FundId).Except(Instruments.Keys).Where(s => s != Guid.Empty).ToList();
                 if (missing.Any())
                 {
                     var missinginstruments = await GetInstrumentsAsync(missing.ToList());

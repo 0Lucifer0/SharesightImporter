@@ -86,7 +86,7 @@ namespace SharesightImporter.SharesightClient
                 var resultJson = await result.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<TradeHistory>(resultJson, options);
             }
-            _logger.LogError("Retrieving trades from sharesies failed", result.ReasonPhrase);
+            _logger.LogError("Retrieving trades from sharesight failed", result.ReasonPhrase);
             throw new ArgumentException();
         }
 
