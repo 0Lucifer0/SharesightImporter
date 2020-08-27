@@ -41,25 +41,9 @@ namespace SharesightImporter.Exporter.SharesiesExporter
             var httpClient = _clientFactory.CreateClient();
             httpClient.BaseAddress = _uri;
 
-            if (_cookies.Count > 0 && !_cookies.GetCookies(_uri).ToList().Any(s => s.Expired))
+            if (_cookies.Count > 0 && !_cookies.GetCookies(_uri).ToList().Any(s => s.Expired) && (DateTime.Now - _bearerRefresh).TotalMinutes < 10)
             {
                 _logger.LogTrace("Using sharesies cached session");
-                if ((DateTime.Now - _bearerRefresh).TotalMinutes > 10)
-                {
-                    var res = await httpClient.GetAsync("identity/check");
-                    httpClient.DefaultRequestHeaders.Add("Cookie", _cookies.GetCookieHeader(_uri));
-                    if (res.IsSuccessStatusCode)
-                    {
-                        var resultdic = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(
-                            await res.Content.ReadAsStringAsync());
-                        _bearer = resultdic["distill_token"].ToString();
-                        _bearerRefresh = DateTime.Now;
-                        _logger.LogInformation("Updated bearer token");
-                        return;
-                    }
-                    _logger.LogError("Sharesies token refresh failed");
-                    throw new ArgumentException();
-                }
                 return;
             }
 
