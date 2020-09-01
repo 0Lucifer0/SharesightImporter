@@ -153,7 +153,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
 
             var trades = new List<TradePost>();
             var order = (transaction.BuyOrder ?? transaction.SellOrder);
-            if (order.State == "cancelled" || order.State == "pending")
+            if (order.State == "cancelled" || order.State == "pending" || order.State == "processing")
             {
                 _logger.LogInformation($"{order.State} transactions not supported", transaction.Reason);
                 return new List<TradePost>();
