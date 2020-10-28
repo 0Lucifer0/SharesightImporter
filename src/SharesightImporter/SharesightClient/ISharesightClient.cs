@@ -7,6 +7,7 @@ namespace SharesightImporter.SharesightClient
     {
         public Task LoginAsync();
         public Task<TradeHistory> GetTradeHistoryAsync(string portfolioId);
-        public Task AddTradeAsync(TradePost trade);
+        public Task<long> AddTradeAsync(TradePost trade);
+        public Task RemoveTradeAsync(long identifier, string portfolioId);
     }
 }

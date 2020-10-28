@@ -51,6 +51,13 @@ namespace SharesightImporter.SharesightClient.Models
             writer.WriteStringValue(dateTimeValue.ToString(
                 "yyyy-MM-dd", CultureInfo.InvariantCulture));
     }
+
+    public class TradeContainer
+    {
+        [JsonPropertyName("trade")]
+        public Trade Trade { get; set; }
+    }
+
     public class TradePost
     {
         [JsonPropertyName("unique_identifier")]

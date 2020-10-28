@@ -90,7 +90,7 @@ namespace SharesightImporter.SharesightClient
             throw new ArgumentException();
         }
 
-        public async Task AddTradeAsync(TradePost trade)
+        public async Task<long> AddTradeAsync(TradePost trade)
         {
             await LoginAsync();
             var httpClient = _clientFactory.CreateClient();
@@ -108,10 +108,30 @@ namespace SharesightImporter.SharesightClient
             if (result.IsSuccessStatusCode)
             {
                 _logger.LogDebug("Trade added to sharesight! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
-                return;
+                var resultJson = await result.Content.ReadAsStringAsync();
+                var des = JsonSerializer.Deserialize<TradeContainer>(resultJson, options);
+                return des.Trade.Id;
             }
 
             _logger.LogError("Adding new trade to sharesight failed", result.ReasonPhrase);
+            throw new ArgumentException();
+        }
+
+        public async Task RemoveTradeAsync(long identifier, string portfolioId)
+        {
+            await LoginAsync();
+            var httpClient = _clientFactory.CreateClient();
+            httpClient.BaseAddress = _uri;
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token!.AccessToken);
+
+            var result = await httpClient.DeleteAsync($"api/v2/trades/{identifier}.json?portfolio_id={portfolioId}");
+            if (result.IsSuccessStatusCode)
+            {
+                _logger.LogDebug("Trade deleted from sharesight! {0}", identifier);
+                return;
+            }
+
+            _logger.LogError("Removing trade from sharesight failed", result.ReasonPhrase);
             throw new ArgumentException();
         }
     }
