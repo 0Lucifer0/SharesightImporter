@@ -18,7 +18,7 @@ Ethereum wallet (Etherscan api)
 Sharesies wallet
 
 ## How to build ? ##
-Ensure you have dotnet core 3.1 installed: https://dotnet.microsoft.com/download
+Ensure you have dotnet 5 installed: https://dotnet.microsoft.com/download
 > scripts/build.cmd
 
 ## How to run it ? ##
