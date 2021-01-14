@@ -3,6 +3,9 @@
   Email: ''
   Password: ''
   PortfolioId: ''
+- ExporterType: Csv
+  Path: 'import.csv'
+  PortfolioId: ''
 SharesightClient:
   CliendId: ''
   ClientSecret: ''

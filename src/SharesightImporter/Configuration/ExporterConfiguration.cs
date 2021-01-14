@@ -15,5 +15,6 @@ namespace SharesightImporter.Configuration
     {
         Sharesies,
         Ethereum
+        Csv
     }
 }
