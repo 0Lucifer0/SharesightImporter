@@ -8,6 +8,7 @@ using SharesightImporter.SharesightClient.Models;
 
 namespace SharesightImporter.Exporter.EthereumExporter
 {
+    // Disclaimer this exporter does not know about price. It just use gas fee as price in either brokerage (BUY) or added to quantity (Sell)
     public class EthereumExporterClient : IExporterClient
     {
         public int Order => 3;
@@ -56,7 +57,6 @@ namespace SharesightImporter.Exporter.EthereumExporter
                 }
             }
 
-            var test = transactions.Sum(o => o.Brokerage);
             return Task.FromResult(transactions);
         }
     }
