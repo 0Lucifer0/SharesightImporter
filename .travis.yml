@@ -32,12 +32,13 @@ jobs:
       script:
         - dotnet restore
         - dotnet publish --runtime win10-x64 --self-contained true -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${TRAVIS_TAG} || true
-        - zip -r SharesightImporter.${TRAVIS_TAG}.zip /tmp/SharesightImporter.${TRAVIS_TAG}
+        - cd /tmp/
+        - zip -r SharesightImporter.${TRAVIS_TAG}.zip SharesightImporter.${TRAVIS_TAG}
       deploy:
         provider: releases
         edge: true
         token: ${GITHUB_TOKEN}
-        file: SharesightImporter.${TRAVIS_TAG}.zip
+        file: /tmp/SharesightImporter.${TRAVIS_TAG}.zip
         cleanup: false
         'on':
           tags: true
