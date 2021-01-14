@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<PublishTrimmed>true</PublishTrimmed>
 		<PublishReadyToRun>true</PublishReadyToRun>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<OutputPath>..\..\build\</OutputPath>
@@ -17,7 +17,6 @@
 		<PackageReference Include="log4net" Version="2.0.12" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
