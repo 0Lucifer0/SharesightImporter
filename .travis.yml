@@ -25,3 +25,19 @@ jobs:
         - dotnet restore
         - dotnet build
         - dotnet test test/SharesightImporter.Tests -v m
+        
+    - stage: release_github
+      name: Publish Release on GitHub
+      if: (tag =~ /^((\d+\.)+\d+)/)
+      script:
+        - dotnet restore
+        - dotnet publish --runtime win10-x64 -c Release -p:PublishSingleFile=true --self-contained true /p:UseAppHost=true -o /tmp/SharesightImporter.${TRAVIS_TAG}
+        - zip -r SharesightImporter.${TRAVIS_TAG}.zip /tmp/SharesightImporter.${TRAVIS_TAG}
+      deploy:
+        provider: releases
+        edge: true
+        token: ${GITHUB_TOKEN}
+        file: /tmp/SharesightImporter.${TRAVIS_TAG}.zip
+        cleanup: false
+        'on':
+          tags: true

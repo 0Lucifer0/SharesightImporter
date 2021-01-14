@@ -14,6 +14,7 @@ namespace SharesightImporter.Configuration
     public enum ExporterType
     {
         Sharesies,
-        Ethereum
+        Ethereum,
+        Csv
     }
 }

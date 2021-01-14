@@ -16,6 +16,7 @@ The referral link offers you a Gopro, Dropbox or Nike free stock! Sharesight can
 ## What is currently supported ? ##
 Ethereum wallet (Etherscan api)
 Sharesies wallet
+Csv file
 
 ## How to build ? ##
 Ensure you have dotnet 5 installed: https://dotnet.microsoft.com/download
@@ -48,6 +49,9 @@ Exporters:
   EtherscanApiKey: ''
   Addresses:
   - ''
+  PortfolioId: ''
+- ExporterType: Csv
+  Path: 'import.csv'
   PortfolioId: ''
 SharesightClient:
   CliendId: ''

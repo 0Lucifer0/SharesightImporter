@@ -5,10 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SharesightImporter.Configuration;
 using SharesightImporter.Exporter;
 using SharesightImporter.SharesightClient;
-using SharesightImporter.SharesightClient.Models;
 
 namespace SharesightImporter
 {
@@ -29,29 +27,30 @@ namespace SharesightImporter
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                try
+                foreach (var exporter in _exporters.OrderBy(o=>o.Order))
                 {
-                    foreach(var exporter in _exporters.ToList())
+                    try
                     {
                         var tradeHistory = await _sharesightClient.GetTradeHistoryAsync(exporter.PortfolioId);
 
                         var trades = await exporter.GetTrades();
-                        foreach (var trade in trades)
+                        foreach (var trade in trades.OrderBy(o => o.TransactionDate.Date).ThenByDescending(o=>o.TransactionType == "BUY").ThenByDescending(o => o.TransactionType == "BONUS").ToList())
                         {
-                            if (tradeHistory.Trades.Any(s => (s.UniqueIdentifier == trade.UniqueIdentifier && trade.UniqueIdentifier != null) || (s.Symbol == trade.Symbol && s.Quantity == trade.Quantity && s.Price == trade.Price && s.TransactionDate.Date == trade.TransactionDate.Date)))
+                            if (tradeHistory.Trades.Any(s => (s.UniqueIdentifier == trade.UniqueIdentifier && trade.UniqueIdentifier != null) || (s.Symbol == trade.Symbol && s.Quantity == trade.Quantity && Math.Round(s.Price ?? 0d, 3) == Math.Round(trade.Price ?? 0d, 3) && s.TransactionDate.Date == trade.TransactionDate.Date)))
                             {
-                                _logger.LogDebug("Matching trade found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
+                                _logger.LogDebug("Matching trade found! {0} {1} {2} {3} {4}", trade.TransactionType, trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                                 continue;
                             }
-                            _logger.LogDebug("Matching trade not found! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
+                            _logger.LogDebug("Matching trade not found! {0} {1} {2} {3} {4}", trade.TransactionType, trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                             await _sharesightClient.AddTradeAsync(trade);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message, ex);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.Message, ex);
-                }
+
                 _logger.LogInformation("All trades imported!");
                 await Task.Delay((int)TimeSpan.FromHours(1).TotalMilliseconds, stoppingToken);
             }

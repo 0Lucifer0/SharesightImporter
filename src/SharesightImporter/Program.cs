@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,7 +9,6 @@ using Serilog;
 using Serilog.Events;
 using SharesightImporter.Configuration;
 using SharesightImporter.Exporter;
-using SharesightImporter.Exporter.SharesiesExporter;
 using SharesightImporter.SharesightClient;
 
 namespace SharesightImporter
@@ -69,6 +67,12 @@ namespace SharesightImporter
                             .FirstOrDefault(s => s.GetValue<string>(nameof(ExporterType)) == name);
                         switch (name)
                         {
+                            case nameof(ExporterType.Csv):
+                                var csvconf = new CsvExporterConfiguration();
+                                secConf.Bind(csvconf);
+                                Validator.ValidateObject(csvconf, new ValidationContext(csvconf), true);
+                                services.AddSingleton(csvconf);
+                                break;
                             case nameof(ExporterType.Ethereum):
                                 var ethConf = new EthereumExporterConfiguration();
                                 secConf.Bind(ethConf);

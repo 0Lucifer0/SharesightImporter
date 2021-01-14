@@ -17,6 +17,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
 {
     public class SharesiesExporterClient : ISharesiesExporterClient
     {
+        public int Order => 2;
         public string PortfolioId => _configuration.PortfolioId;
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger<SharesiesExporterClient> _logger;

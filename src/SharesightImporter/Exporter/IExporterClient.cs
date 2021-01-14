@@ -8,5 +8,6 @@ namespace SharesightImporter.Exporter
     {
         string PortfolioId { get; }
         Task<List<TradePost>> GetTrades();
+        int Order { get; }
     }
 }
