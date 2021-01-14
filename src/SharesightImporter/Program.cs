@@ -85,12 +85,6 @@ namespace SharesightImporter
                                 Validator.ValidateObject(sharesiesConf, new ValidationContext(sharesiesConf), true);
                                 services.AddSingleton(sharesiesConf);
                                 break;
-                            case nameof(ExporterType.CROCoin):
-                                var croconf = new CROCoinExporterConfiguration();
-                                secConf.Bind(croconf);
-                                Validator.ValidateObject(croconf, new ValidationContext(croconf), true);
-                                services.AddSingleton(croconf);
-                                break;
                         }
 
                         services.Add(new ServiceDescriptor(typeof(IExporterClient), type, ServiceLifetime.Transient));
