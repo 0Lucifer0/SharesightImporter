@@ -62,7 +62,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
             throw new ArgumentException();
         }
 
-        public async Task<TradeHistory> GetTradeHistoryAsync(string portfolioId)
+        public async Task<Trade[]> GetTradeHistoryAsync(string portfolioId)
         {
             await LoginAsync();
             var httpClient = _clientFactory.CreateClient();
@@ -84,7 +84,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
                     PropertyNameCaseInsensitive = true
                 };
                 var resultJson = await result.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<TradeHistory>(resultJson, options);
+                return JsonSerializer.Deserialize<TradeHistory>(resultJson, options)!.Trades;
             }
             _logger.LogError("Retrieving trades from sharesight failed", result.ReasonPhrase);
             throw new ArgumentException();

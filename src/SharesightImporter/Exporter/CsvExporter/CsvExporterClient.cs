@@ -4,6 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using SharesightImporter.Configuration;
 using SharesightImporter.Importer.SharesightImporter.SharesightImporterClient.Models;
@@ -28,41 +30,26 @@ namespace SharesightImporter.Exporter.CsvExporter
         {
             using var reader = new StreamReader(_configuration.Path);
             var tradeList = new List<TradePost>();
-            while (!reader.EndOfStream)
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                var line = await reader.ReadLineAsync();
-                var values = line.Split(',');
-                //Trade Date,Instrument Code,Market Code,Quantity,Price,Transaction Type,Comments (optional), Brokerage Currency Code(optional)
-                if (values.Length > 5)
+                ShouldQuote = _ => false,
+            });
+            var record = new CsvTrade();
+            var records = csv.EnumerateRecordsAsync(record);
+            await foreach (var r in records)
+            {
+                tradeList.Add(new TradePost
                 {
-                    var date = values[0];
-                    var instrument = values[1];
-                    var market = values[2];
-                    var qty = values[3];
-                    var price = values[4];
-                    var type = values[5];
-                    var comments = values[6];
-                    var brokerageCode = values[7];
-                    double priceDouble = 0;
-                    double qtyDouble = 0;
-                    if ((string.IsNullOrEmpty(qty) || double.TryParse(qty, out qtyDouble))
-                        && (string.IsNullOrEmpty(price) || double.TryParse(price, out priceDouble)) &&
-                        DateTimeOffset.TryParseExact(date, new[] { "yyyy-MM-dd HH:mm:ss" }, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var dateDateTimeOffset))
-                    {
-                        tradeList.Add(new TradePost
-                        {
-                            Quantity = string.IsNullOrEmpty(qty) ? null : (double?)qtyDouble,
-                            Market = market,
-                            PortfolioId = long.Parse(PortfolioId),
-                            Symbol = instrument,
-                            Price = string.IsNullOrEmpty(price) ? null : (double?)priceDouble,
-                            TransactionType = type,
-                            TransactionDate = dateDateTimeOffset,
-                            Comments = string.IsNullOrEmpty(comments) ? null : comments,
-                            BrokerageCurrencyCode = brokerageCode
-                        });
-                    }
-                }
+                    Quantity = r.Quantity,
+                    Market = r.MarketCode,
+                    PortfolioId = string.IsNullOrEmpty(r.PortfolioId) ? long.Parse(PortfolioId) : long.Parse(r.PortfolioId),
+                    Symbol = r.InstrumentCode,
+                    Price = r.Price,
+                    TransactionType = r.TransactionType,
+                    TransactionDate = r.TradeDate,
+                    Comments = r.Comments,
+                    BrokerageCurrencyCode = r.BrokerageCurrencyCode
+                });
             }
 
             return tradeList;

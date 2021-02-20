@@ -40,18 +40,18 @@ namespace SharesightImporter
                                 .ThenByDescending(o => o.TransactionType == "BUY")
                                 .ThenByDescending(o => o.TransactionType == "BONUS").ToList())
                             {
-                                if (tradeHistory.Trades.Any(s =>
+                                if (tradeHistory.Any(s =>
                                     (s.UniqueIdentifier == trade.UniqueIdentifier && trade.UniqueIdentifier != null) ||
                                     (s.Symbol == trade.Symbol && s.Quantity == trade.Quantity &&
                                      Math.Round(s.Price ?? 0d, 3) == Math.Round(trade.Price ?? 0d, 3) &&
                                      s.TransactionDate.Date == trade.TransactionDate.Date)))
                                 {
-                                    _logger.LogDebug("Matching trade found! {0} {1} {2} {3} {4}", trade.TransactionType,
+                                    _logger.LogDebug("Matching trade found in {0}! {1} {2} {3} {4} {5}", importer.GetType().Name.Replace("ImporterClient", ""), trade.TransactionType,
                                         trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                                     continue;
                                 }
 
-                                _logger.LogDebug("Matching trade not found! {0} {1} {2} {3} {4}", trade.TransactionType,
+                                _logger.LogDebug("Matching trade not found in {0}! {1} {2} {3} {4} {5}", importer.GetType().Name.Replace("ImporterClient", ""), trade.TransactionType,
                                     trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                                 await importer.AddTradeAsync(trade);
                             }
