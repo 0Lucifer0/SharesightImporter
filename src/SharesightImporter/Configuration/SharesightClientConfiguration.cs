@@ -2,7 +2,7 @@
 
 namespace SharesightImporter.Configuration
 {
-    public class SharesightClientConfiguration
+    public class SharesightClientConfiguration : ImporterConfiguration
     {
         [Required]
         public string CliendId { get; set; } = null!;

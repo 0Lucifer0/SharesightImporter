@@ -53,7 +53,10 @@ Exporters:
 - ExporterType: Csv
   Path: 'import.csv'
   PortfolioId: ''
-SharesightClient:
+Importers:
+- ImporterType: Sharesight
   CliendId: ''
   ClientSecret: ''
+- ImporterType: Csv
+  Path: 'export.csv'
 ```

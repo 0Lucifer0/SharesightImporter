@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SharesightImporter.Configuration;
-using SharesightImporter.SharesightClient.Models;
+using SharesightImporter.Importer.SharesightImporter.SharesightImporterClient.Models;
 
 namespace SharesightImporter.Exporter.CsvExporter
 {

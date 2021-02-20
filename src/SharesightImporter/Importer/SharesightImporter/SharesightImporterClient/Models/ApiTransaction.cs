@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace SharesightImporter.SharesightClient.Models
+namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClient.Models
 {
     public class ApiTransaction
     {

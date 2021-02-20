@@ -7,18 +7,19 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using SharesightImporter.SharesightClient.Models;
+using SharesightImporter.Configuration;
+using SharesightImporter.Importer.SharesightImporter.SharesightImporterClient.Models;
 
-namespace SharesightImporter.SharesightClient
+namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClient
 {
-    public class SharesightClient : ISharesightClient
+    public class SharesightImporterClient : ISharesightImporterClient
     {
         private readonly IHttpClientFactory _clientFactory;
-        private readonly ILogger<SharesightClient> _logger;
+        private readonly ILogger<SharesightImporterClient> _logger;
         private readonly Uri _uri = new Uri("https://api.sharesight.com");
-        private readonly Configuration.Configuration _configuration;
+        private readonly SharesightClientConfiguration _configuration;
         private Token? _token;
-        public SharesightClient(IHttpClientFactory clientFactory, ILogger<SharesightClient> logger, Configuration.Configuration configuration)
+        public SharesightImporterClient(IHttpClientFactory clientFactory, ILogger<SharesightImporterClient> logger, SharesightClientConfiguration configuration)
         {
             _clientFactory = clientFactory;
             _logger = logger;
@@ -44,8 +45,8 @@ namespace SharesightImporter.SharesightClient
             var content = new StringContent(JsonSerializer.Serialize(new
             {
                 grant_type = "client_credentials",
-                client_id = _configuration.SharesightClient.CliendId,
-                client_secret = _configuration.SharesightClient.ClientSecret,
+                client_id = _configuration.CliendId,
+                client_secret = _configuration.ClientSecret,
             }, options), Encoding.UTF8, "application/json");
 
             var result = await httpClient.PostAsync("oauth2/token", content);
