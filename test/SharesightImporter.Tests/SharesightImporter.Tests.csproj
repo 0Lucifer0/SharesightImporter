@@ -6,7 +6,6 @@
 		<Nullable>enable</Nullable>
 		<PublishTrimmed>true</PublishTrimmed>
 		<PublishReadyToRun>true</PublishReadyToRun>
-		<Version>1.0.5</Version>
 	</PropertyGroup>
 
   <ItemGroup>
