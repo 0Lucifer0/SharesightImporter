@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SharesightImporter.SharesightClient.Models;
+using SharesightImporter.Importer.SharesightImporter.SharesightImporterClient.Models;
 
 namespace SharesightImporter.Exporter
 {

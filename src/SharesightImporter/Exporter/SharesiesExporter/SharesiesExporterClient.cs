@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using SharesightImporter.Configuration;
 using SharesightImporter.Exporter.SharesiesExporter.Models;
-using SharesightImporter.SharesightClient.Models;
+using SharesightImporter.Importer.SharesightImporter.SharesightImporterClient.Models;
 
 namespace SharesightImporter.Exporter.SharesiesExporter
 {

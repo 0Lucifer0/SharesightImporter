@@ -5,12 +5,13 @@
 		<Nullable>enable</Nullable>
 		<PublishTrimmed>true</PublishTrimmed>
 		<PublishReadyToRun>true</PublishReadyToRun>
-		<Version>1.0.5</Version>
+		<Version>1.0.6</Version>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<OutputPath>..\..\build\</OutputPath>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="CsvHelper" Version="24.0.0" />
 		<PackageReference Include="DotNetToolkit" Version="1.7.0" />
 		<PackageReference Include="Etherscan.NetSDK" Version="0.1.0" />
 		<PackageReference Include="EtherscanApi.Net" Version="0.0.5" />

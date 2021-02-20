@@ -9,7 +9,8 @@ using Serilog;
 using Serilog.Events;
 using SharesightImporter.Configuration;
 using SharesightImporter.Exporter;
-using SharesightImporter.SharesightClient;
+using SharesightImporter.Importer;
+using SharesightImporter.Importer.SharesightImporter.SharesightImporterClient;
 
 namespace SharesightImporter
 {
@@ -89,7 +90,43 @@ namespace SharesightImporter
 
                         services.Add(new ServiceDescriptor(typeof(IExporterClient), type, ServiceLifetime.Transient));
                     }
-                    services.AddTransient<ISharesightClient, SharesightClient.SharesightClient>();
+                    foreach (Type type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
+                      .Where(mytype => mytype.GetInterfaces().Contains(typeof(IImporterClient))))
+                    {
+                        var name = type.Name.Replace("ImporterClient", "");
+                        var isDefined =
+                            Enum.IsDefined(typeof(ImporterType), name);
+                        if (!isDefined)
+                        {
+                            continue;
+                        }
+                        var anyImporter = configuration.Importers.Any(s =>
+                             s.ImporterType.ToString() == name);
+                        if (!anyImporter)
+                        {
+                            continue;
+                        }
+
+                        var secConf = config.GetSection("Importers").GetChildren()
+                            .FirstOrDefault(s => s.GetValue<string>(nameof(ImporterType)) == name);
+                        switch (name)
+                        {
+                            case nameof(ImporterType.Sharesight):
+                                var csvconf = new SharesightClientConfiguration();
+                                secConf.Bind(csvconf);
+                                Validator.ValidateObject(csvconf, new ValidationContext(csvconf), true);
+                                services.AddSingleton(csvconf);
+                                services.Add(new ServiceDescriptor(typeof(ISharesightImporterClient), type, ServiceLifetime.Transient));
+                                break;
+                            case nameof(ImporterType.Csv):
+                                var ethConf = new CsvImporterConfiguration();
+                                secConf.Bind(ethConf);
+                                Validator.ValidateObject(ethConf, new ValidationContext(ethConf), true);
+                                services.AddSingleton(ethConf);
+                                break;
+                        }
+                        services.Add(new ServiceDescriptor(typeof(IImporterClient), type, ServiceLifetime.Transient));
+                    }
                     services.AddHostedService<Worker>();
                 });
         }

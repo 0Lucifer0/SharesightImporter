@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using EtherscanApi.Net.Interfaces;
 using Microsoft.Extensions.Logging;
 using SharesightImporter.Configuration;
-using SharesightImporter.SharesightClient.Models;
+using SharesightImporter.Importer.SharesightImporter.SharesightImporterClient.Models;
 
 namespace SharesightImporter.Exporter.EthereumExporter
 {

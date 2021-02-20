@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SharesightImporter.SharesightClient.Models
+namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClient.Models
 {
     public class Trade : TradePost
     {
