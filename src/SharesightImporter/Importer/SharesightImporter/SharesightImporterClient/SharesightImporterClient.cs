@@ -107,7 +107,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
             var result = await httpClient.PostAsync("api/v2/trades.json", content);
             if (result.IsSuccessStatusCode)
             {
-                _logger.LogDebug("Trade added to sharesight! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
+                _logger.LogInformation("Trade added to sharesight! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                 var resultJson = await result.Content.ReadAsStringAsync();
                 var des = JsonSerializer.Deserialize<TradeContainer>(resultJson, options);
                 return des.Trade.Id;
