@@ -113,7 +113,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
                 return des.Trade.Id;
             }
 
-            _logger.LogError("Adding new trade to sharesight failed", result.ReasonPhrase);
+            _logger.LogError("Adding new trade to sharesight failed {0} {1}", result.ReasonPhrase, JsonSerializer.Serialize(tradeObj, options));
             throw new ArgumentException();
         }
 
