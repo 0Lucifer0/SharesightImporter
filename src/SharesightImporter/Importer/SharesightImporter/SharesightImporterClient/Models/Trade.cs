@@ -8,7 +8,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
     public class Trade : TradePost
     {
         [JsonPropertyName("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         [JsonPropertyName("value")]
         public double Value { get; set; }

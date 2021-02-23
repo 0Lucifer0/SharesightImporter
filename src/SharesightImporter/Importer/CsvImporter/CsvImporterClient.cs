@@ -54,7 +54,7 @@ namespace SharesightImporter.Importer.CsvImporter
             }
         }
 
-        public async Task<long> AddTradeAsync(TradePost trade)
+        public async Task<long?> AddTradeAsync(TradePost trade)
         {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture);
             var fileExist = File.Exists(_configuration.Path);

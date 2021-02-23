@@ -90,7 +90,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
             throw new ArgumentException();
         }
 
-        public async Task<long> AddTradeAsync(TradePost trade)
+        public async Task<long?> AddTradeAsync(TradePost trade)
         {
             await LoginAsync();
             var httpClient = _clientFactory.CreateClient();
@@ -113,7 +113,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
                 return des.Trade.Id;
             }
 
-            _logger.LogError("Adding new trade to sharesight failed", result.ReasonPhrase);
+            _logger.LogError("Adding new trade to sharesight failed {0} {1}", result.ReasonPhrase, JsonSerializer.Serialize(tradeObj, options));
             throw new ArgumentException();
         }
 
