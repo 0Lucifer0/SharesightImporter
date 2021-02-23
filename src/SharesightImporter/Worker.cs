@@ -46,12 +46,12 @@ namespace SharesightImporter
                                      Math.Round(s.Price ?? 0d, 3) == Math.Round(trade.Price ?? 0d, 3) &&
                                      s.TransactionDate.Date == trade.TransactionDate.Date)))
                                 {
-                                    _logger.LogDebug("Matching trade found in {0}! {1} {2} {3} {4} {5}", importer.GetType().Name.Replace("ImporterClient", ""), trade.TransactionType,
+                                    _logger.LogInformation("Matching trade found in {0}! {1} {2} {3} {4} {5}", importer.GetType().Name.Replace("ImporterClient", ""), trade.TransactionType,
                                         trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                                     continue;
                                 }
 
-                                _logger.LogDebug("Matching trade not found in {0}! {1} {2} {3} {4} {5}", importer.GetType().Name.Replace("ImporterClient", ""), trade.TransactionType,
+                                _logger.LogInformation("Matching trade not found in {0}! {1} {2} {3} {4} {5}", importer.GetType().Name.Replace("ImporterClient", ""), trade.TransactionType,
                                     trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                                 await importer.AddTradeAsync(trade);
                             }
