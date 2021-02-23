@@ -10,6 +10,6 @@ namespace SharesightImporter.Importer
     public interface IImporterClient
     {
          Task<Trade[]> GetTradeHistoryAsync(string portfolioId);
-         Task<long> AddTradeAsync(TradePost trade);
+         Task<long?> AddTradeAsync(TradePost trade);
     }
 }

@@ -90,7 +90,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
             throw new ArgumentException();
         }
 
-        public async Task<long> AddTradeAsync(TradePost trade)
+        public async Task<long?> AddTradeAsync(TradePost trade)
         {
             await LoginAsync();
             var httpClient = _clientFactory.CreateClient();

@@ -27,7 +27,7 @@ namespace SharesightImporter
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                foreach (var exporter in _exporters.OrderBy(o=>o.Order))
+                foreach (var exporter in _exporters.OrderBy(o => o.Order))
                 {
                     foreach (var importer in _importers)
                     {
@@ -36,7 +36,12 @@ namespace SharesightImporter
                             var tradeHistory = await importer.GetTradeHistoryAsync(exporter.PortfolioId);
 
                             var trades = await exporter.GetTrades();
-                            foreach (var trade in trades.OrderBy(o => o.TransactionDate.Date)
+
+                            var grouped = trades.GroupBy(o => o.UniqueIdentifier).ToList();
+                            var uniqueTrades = grouped.Where(x => x.Key == null).SelectMany(x => x.ToList()).ToList();
+                            uniqueTrades.AddRange(grouped.Where(x => x.Key != null).Select(x => x.First()));
+                            var importerName = importer.GetType().Name.Replace("ImporterClient", "");
+                            foreach (var trade in uniqueTrades.OrderBy(o => o.TransactionDate.Date)
                                 .ThenByDescending(o => o.TransactionType == "BUY")
                                 .ThenByDescending(o => o.TransactionType == "BONUS").ToList())
                             {
@@ -46,14 +51,22 @@ namespace SharesightImporter
                                      Math.Round(s.Price ?? 0d, 3) == Math.Round(trade.Price ?? 0d, 3) &&
                                      s.TransactionDate.Date == trade.TransactionDate.Date)))
                                 {
-                                    _logger.LogInformation("Matching trade found in {0}! {1} {2} {3} {4} {5}", importer.GetType().Name.Replace("ImporterClient", ""), trade.TransactionType,
+                                    _logger.LogInformation("Matching trade found in {0}! {1} {2} {3} {4} {5}", importerName, trade.TransactionType,
                                         trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                                     continue;
                                 }
 
-                                _logger.LogInformation("Matching trade not found in {0}! {1} {2} {3} {4} {5}", importer.GetType().Name.Replace("ImporterClient", ""), trade.TransactionType,
-                                    trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
-                                await importer.AddTradeAsync(trade);
+                                _logger.LogInformation("Matching trade not found in {0}! {1} {2} {3} {4} {5}", importerName, trade.TransactionType,
+                                trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
+                                try
+                                {
+                                    await importer.AddTradeAsync(trade);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError("Adding new trade in {0} failed! {1} {2} {3} {4} {5}", importerName, trade.TransactionType,
+                                        trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date, ex);
+                                }
                             }
                         }
                         catch (Exception ex)
