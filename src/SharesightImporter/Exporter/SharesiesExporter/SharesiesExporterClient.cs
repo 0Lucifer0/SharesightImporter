@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -146,19 +147,44 @@ namespace SharesightImporter.Exporter.SharesiesExporter
 
         private List<TradePost> Convert(Transaction transaction)
         {
-            if (transaction.BuyOrder == null && transaction.SellOrder == null)
+            var orderType = transaction switch
+            {
+                var x when x.BuyOrder != null => "Buy",
+                var x when x.SellOrder != null => "Sell",
+                var x when x.CsnTransferOrder != null => "Csn",
+                var x when x.FxOrder != null => "Fx",
+                var x when x.WithdrawalOrder != null => "Withdrawal",
+                _ => null
+            };
+
+            if (orderType == null)
             {
                 _logger.LogInformation("{0} transactions not supported", transaction.Reason);
                 return new List<TradePost>();
             }
 
             var trades = new List<TradePost>();
-            var order = (transaction.BuyOrder ?? transaction.SellOrder);
-            if (order.State == "cancelled" || order.State == "pending" || order.State == "processing")
+            var order = (transaction.BuyOrder ?? transaction.SellOrder ?? transaction.FxOrder ?? transaction.CsnTransferOrder ?? transaction.WithdrawalOrder);
+            if (order.State != "fulfilled")
             {
                 _logger.LogInformation($"{order.State} transactions not supported", transaction.Reason);
                 return new List<TradePost>();
             }
+
+            var transactionType = orderType switch
+            {
+                "Buy" => "BUY",
+                "Sell" => "SELL",
+                "Csn" => "BUY",
+                _ => null
+            };
+
+            if (transactionType == null)
+            {
+                _logger.LogInformation("{0} orders are not supported", orderType);
+                return new List<TradePost>();
+            }
+
             if (order.Trades.Any())
             {
                 trades.AddRange(order.Trades.Select(trade => new TradePost
@@ -171,7 +197,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
                     PortfolioId = int.Parse(_configuration.PortfolioId),
                     BrokerageCurrencyCode = transaction.Currency.ToUpper(),
                     Symbol = Instruments[transaction.FundId].Symbol.ToUpper(),
-                    TransactionType = order.Type.ToUpper(),
+                    TransactionType = transactionType,
                     UniqueIdentifier = trade.ContractNoteNumber,
                 }));
             }
@@ -187,7 +213,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
                     PortfolioId = int.Parse(_configuration.PortfolioId),
                     BrokerageCurrencyCode = transaction.Currency.ToUpper(),
                     Symbol = Instruments[transaction.FundId].Symbol.ToUpper(),
-                    TransactionType = order.Type.ToUpper(),
+                    TransactionType = transactionType,
                     UniqueIdentifier = transaction.TransactionId.ToString(),
                 });
             }
