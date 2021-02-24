@@ -41,7 +41,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
             ref Utf8JsonReader reader,
             Type typeToConvert,
             JsonSerializerOptions options) =>
-            DateTimeOffset.ParseExact(reader.GetString(),
+            DateTimeOffset.ParseExact(reader.GetString()!,
                 "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
         public override void Write(
@@ -55,7 +55,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
     public class TradeContainer
     {
         [JsonPropertyName("trade")]
-        public Trade Trade { get; set; }
+        public Trade? Trade { get; set; }
     }
 
     public class TradePost
