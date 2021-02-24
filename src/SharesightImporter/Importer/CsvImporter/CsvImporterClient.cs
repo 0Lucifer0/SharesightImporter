@@ -69,15 +69,15 @@ namespace SharesightImporter.Importer.CsvImporter
             }
             csv.WriteRecord(new CsvTrade()
             {
-                TransactionType = trade.TransactionType,
+                TransactionType = trade.TransactionType ?? "",
                 Price = trade.Price,
-                MarketCode = trade.Market,
+                MarketCode = trade.Market ?? "",
                 TradeDate = trade.TransactionDate.DateTime,
                 Quantity = trade.Quantity,
                 Comments = trade.Comments,
                 BrokerageCurrencyCode = trade.BrokerageCurrencyCode,
-                InstrumentCode = trade.Symbol,
-                PortfolioId = trade.PortfolioId?.ToString()
+                InstrumentCode = trade.Symbol ?? "",
+                PortfolioId = trade.PortfolioId?.ToString() ?? ""
             });
             await csv.NextRecordAsync();
             return trade.GetHashCode();

@@ -110,7 +110,7 @@ namespace SharesightImporter.Importer.SharesightImporter.SharesightImporterClien
                 _logger.LogInformation("Trade added to sharesight! {0} {1} {2} {3}", trade.Symbol, trade.Quantity, trade.Price, trade.TransactionDate.Date);
                 var resultJson = await result.Content.ReadAsStringAsync();
                 var des = JsonSerializer.Deserialize<TradeContainer>(resultJson, options);
-                return des.Trade.Id;
+                return des?.Trade?.Id;
             }
 
             _logger.LogError("Adding new trade to sharesight failed {0} {1}", result.ReasonPhrase, JsonSerializer.Serialize(tradeObj, options));

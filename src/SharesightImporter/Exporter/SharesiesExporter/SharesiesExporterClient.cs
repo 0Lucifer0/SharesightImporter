@@ -67,8 +67,8 @@ namespace SharesightImporter.Exporter.SharesiesExporter
             {
                 var resultdic = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(
                     await result.Content.ReadAsStringAsync());
-                var user = resultdic["user"].ToString();
-                _bearer = resultdic["distill_token"].ToString();
+                var user = resultdic?["user"].ToString();
+                _bearer = resultdic?["distill_token"].ToString();
                 _bearerRefresh = DateTime.Now;
                 _userId = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(user)["id"].ToString();
                 _logger.LogInformation("Connected to sharesies!");
@@ -109,7 +109,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
                     PropertyNameCaseInsensitive = true
                 };
                 var resultJson = await result.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<TransactionHistory>(resultJson, options);
+                return JsonSerializer.Deserialize<TransactionHistory>(resultJson, options)!;
             }
             _logger.LogError("Retrieving transactions from sharesies failed", result.ReasonPhrase);
             throw new ArgumentException();
@@ -139,7 +139,7 @@ namespace SharesightImporter.Exporter.SharesiesExporter
             if (result.IsSuccessStatusCode)
             {
                 var resultJson = await result.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<InstrumentResult>(resultJson, options).Instruments.ToDictionary(s => s.Id, s => s);
+                return JsonSerializer.Deserialize<InstrumentResult>(resultJson, options)!.Instruments.ToDictionary(s => s.Id, s => s);
             }
             _logger.LogError("Retrieving funds from sharesies failed", result.ReasonPhrase);
             throw new ArgumentException();
@@ -165,9 +165,9 @@ namespace SharesightImporter.Exporter.SharesiesExporter
 
             var trades = new List<TradePost>();
             var order = (transaction.BuyOrder ?? transaction.SellOrder ?? transaction.FxOrder ?? transaction.CsnTransferOrder ?? transaction.WithdrawalOrder);
-            if (order.State != "fulfilled")
+            if (order?.State != "fulfilled")
             {
-                _logger.LogInformation($"{order.State} transactions not supported", transaction.Reason);
+                _logger.LogInformation($"{order?.State} transactions not supported", transaction.Reason);
                 return new List<TradePost>();
             }
 
