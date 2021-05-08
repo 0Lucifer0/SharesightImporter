@@ -17,33 +17,37 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+        
     - name: Check Tag
       id: check-tag
       run: |
         if [[ ${{ github.event.ref }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo ::set-output name=match::true
         fi
-    - name: test_unit_testing
+        
+    - name: Run Unit Tests
       run: |
         dotnet restore
         dotnet build
         dotnet test test/SharesightImporter.Tests -v m
-    - name: release_github
+        
+    - name: Build Release
       if: steps.check-tag.outputs.match == 'true'
       run: |
         dotnet restore
-        dotnet publish --runtime win10-x64 --self-contained true -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${GITHUB_RUN_NUMBER} || true
+        dotnet publish --runtime win10-x64 -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${GITHUB_RUN_NUMBER} || true
         cd /tmp/
         zip -r SharesightImporter.${GITHUB_RUN_NUMBER}.zip SharesightImporter.${GITHUB_RUN_NUMBER}
-    - name: Get release
+        
+    - name: Get Github Release Repo
       if: steps.check-tag.outputs.match == 'true'
       id: get_release
       uses: bruceadams/get-release@v1.2.2
       env:
-        REPO_TOKEN: ${{ github.repo_token }}
+        REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+        
     - name: Upload Release Asset
       if: steps.check-tag.outputs.match == 'true'
-      id: upload-release-asset 
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
