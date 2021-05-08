@@ -10,9 +10,7 @@ on:
     branches: [ master ]
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -22,7 +20,7 @@ jobs:
     - name: Check Tag
       id: check-tag
       run: |
-        if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        if [[ ${{ github.event.ref }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo ::set-output name=match::true
         fi
     - name: test_unit_testing
@@ -37,4 +35,21 @@ jobs:
         dotnet publish --runtime win10-x64 --self-contained true -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${GITHUB_RUN_NUMBER} || true
         cd /tmp/
         zip -r SharesightImporter.${GITHUB_RUN_NUMBER}.zip SharesightImporter.${GITHUB_RUN_NUMBER}
+    - name: Get release
+      if: steps.check-tag.outputs.match == 'true'
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
+      env:
+        REPO_TOKEN: ${{ github.repo_token }}
+    - name: Upload Release Asset
+      if: steps.check-tag.outputs.match == 'true'
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }} 
+        asset_path: /tmp/SharesightImporter.${GITHUB_RUN_NUMBER}.zip
+        asset_name: SharesightImporter.${GITHUB_RUN_NUMBER}.zip
+        asset_content_type: application/zip
         
