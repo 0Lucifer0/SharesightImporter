@@ -39,12 +39,11 @@ jobs:
         cd /tmp/
         zip -r SharesightImporter.${GITHUB_RUN_NUMBER}.zip SharesightImporter.${GITHUB_RUN_NUMBER}
         
-    - name: Get Github Release Repo
-      if: steps.check-tag.outputs.match == 'true'
-      id: get_release
-      uses: bruceadams/get-release@v1.2.2
+    - name: Gets Latest Release
+      id: latest_release_info
+      uses: jossef/action-latest-release-info@v1.1.0
       env:
-        REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         
     - name: Upload Release Asset
       if: steps.check-tag.outputs.match == 'true'
@@ -52,7 +51,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       with:
-        upload_url: ${{ steps.get_release.outputs.upload_url }} 
+        upload_url: ${{ steps.latest_release_info.outputs.upload_url }} 
         asset_path: /tmp/SharesightImporter.${GITHUB_RUN_NUMBER}.zip
         asset_name: SharesightImporter.${GITHUB_RUN_NUMBER}.zip
         asset_content_type: application/zip
