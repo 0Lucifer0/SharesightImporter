@@ -22,7 +22,7 @@ jobs:
         dotnet build
         dotnet test test/SharesightImporter.Tests -v m
     - name: release_github
-      if: ${{  github.ref == [12].[0-9]+.[0-9]+}}
+      if: github.ref == [12].[0-9]+.[0-9]+
       run: |
         dotnet restore
         dotnet publish --runtime win10-x64 --self-contained true -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${GITHUB_RUN_NUMBER} || true
