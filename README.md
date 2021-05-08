@@ -1,5 +1,5 @@
 # Sharesight Importer #
-[![Travis build status](https://travis-ci.com/0Lucifer0/SharesightImporter.svg?branch=master)](https://travis-ci.com/0Lucifer0/SharesightImporter)<br/>
+[![.NET](https://github.com/0Lucifer0/SharesightImporter/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/0Lucifer0/SharesightImporter/actions/workflows/dotnet.yml)<br/><br/>
 This tool automatically add all of your trades into a Sharesight portfolio.
 
 ## Referral Links ##
