@@ -52,7 +52,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       with:
         upload_url: ${{ steps.latest_release_info.outputs.upload_url }} 
-        asset_path: /tmp/SharesightImporter.${GITHUB_RUN_NUMBER}.zip
-        asset_name: SharesightImporter.${GITHUB_RUN_NUMBER}.zip
+        asset_path: /tmp/SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip
+        asset_name: SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip
         asset_content_type: application/zip
         
