@@ -31,13 +31,15 @@ jobs:
         dotnet build
         dotnet test test/SharesightImporter.Tests -v m
         
-    - name: Build Release
+    - name: Build Artifact
       if: steps.check-tag.outputs.match == 'true'
       run: |
         dotnet restore
-        dotnet publish --runtime win10-x64 -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${GITHUB_RUN_NUMBER} || true
+        dotnet publish --runtime win10-x64 -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${{GITHUB_RUN_NUMBER}} || true
         cd /tmp/
-        zip -r SharesightImporter.${GITHUB_RUN_NUMBER}.zip SharesightImporter.${GITHUB_RUN_NUMBER}
+        zip -r SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip SharesightImporter.${{GITHUB_RUN_NUMBER}}
+        echo ::set-output name=ARTIFACT_PATH::/tmp/SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip
+        echo ::set-output name=ARTIFACT_NAME::SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip
         
     - name: Gets Latest Release
       id: latest_release_info
@@ -52,7 +54,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       with:
         upload_url: ${{ steps.latest_release_info.outputs.upload_url }} 
-        asset_path: /tmp/SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip
-        asset_name: SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip
+        asset_path: ${{ steps.build_artifact.outputs.ARTIFACT_PATH }}
+        asset_name: ${{ steps.build_artifact.outputs.ARTIFACT_NAME }}
         asset_content_type: application/zip
         
