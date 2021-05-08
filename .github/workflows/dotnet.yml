@@ -33,6 +33,7 @@ jobs:
         
     - name: Build Artifact
       if: steps.check-tag.outputs.match == 'true'
+      id: build_artifact
       run: |
         dotnet restore
         dotnet publish --runtime win10-x64 -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${GITHUB_RUN_NUMBER} || true
