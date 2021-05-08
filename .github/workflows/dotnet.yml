@@ -35,11 +35,11 @@ jobs:
       if: steps.check-tag.outputs.match == 'true'
       run: |
         dotnet restore
-        dotnet publish --runtime win10-x64 -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${{GITHUB_RUN_NUMBER}} || true
+        dotnet publish --runtime win10-x64 -c Release /p:PublishReadyToRun=false /p:PublishSingleFile=true /p:UseAppHost=true -o /tmp/SharesightImporter.${GITHUB_RUN_NUMBER} || true
         cd /tmp/
-        zip -r SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip SharesightImporter.${{GITHUB_RUN_NUMBER}}
-        echo ::set-output name=ARTIFACT_PATH::/tmp/SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip
-        echo ::set-output name=ARTIFACT_NAME::SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip
+        zip -r SharesightImporter.${{GITHUB_RUN_NUMBER}}.zip SharesightImporter.${GITHUB_RUN_NUMBER}
+        echo ::set-output name=ARTIFACT_PATH::/tmp/SharesightImporter.${GITHUB_RUN_NUMBER}.zip
+        echo ::set-output name=ARTIFACT_NAME::SharesightImporter.${GITHUB_RUN_NUMBER}.zip
         
     - name: Gets Latest Release
       id: latest_release_info
